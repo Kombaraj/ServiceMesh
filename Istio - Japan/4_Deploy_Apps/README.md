@@ -15,6 +15,12 @@ Backend Redis
 - multi slaves (read)
 - slaves sync continuously from master
 
++++ NEW +++
+```
+kubectl apply -f guestbook-all-in-one.yaml
+```
++++ NEW +++
+
 ## 4.1 Deploy Redis Master
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook-go/redis-master-controller.json
@@ -106,6 +112,14 @@ kubectl create namespace nginx-ingress-controller
 helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 helm repo update
 helm install nginx-ingress-controller stable/nginx-ingress -n nginx-ingress-controller
+
+(OR)
+
+helm repo add nginx-stable https://helm.nginx.com/stable
+helm repo update
+
+kubectl create namespace nginx-ingress-controller
+helm install nginx-ingress-controller nginx-stable/nginx-ingress -n nginx-ingress-controller
 ```
 
 

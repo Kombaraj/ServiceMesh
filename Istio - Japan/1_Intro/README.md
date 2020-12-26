@@ -232,15 +232,36 @@ eks_worker_nodes_demo.pem
 eksctl create cluster \
     --name eks-from-eksctl \
     --version 1.16 \
-    --region us-west-2 \
+    --region us-east-2 \
     --nodegroup-name workers \
-    --node-type t3.large \
+    --node-type t3.medium \
     --nodes 1 \
     --nodes-min 1 \
     --nodes-max 2 \
     --ssh-access \
-    --ssh-public-key ~/.ssh/eks-demo.pem.pub \
+    --ssh-public-key kube-demo.pem \
     --managed
+```
+(OR)
+
+```bash
+eksctl create cluster --name=eksdemo1 \
+                       --region=us-east-2 \
+                       --version=1.16 \
+                       --node-type=t3.medium \
+                       --nodes=2 \
+                       --nodes-min=2 \
+                       --nodes-max=4 \
+                       --node-volume-size=20 \
+                       --ssh-access \
+                       --ssh-public-key=kube-demo \
+                       --managed \
+                       --asg-access \
+                       --external-dns-access \
+                       --full-ecr-access \
+                       --appmesh-access \
+                       --alb-ingress-access 
+
 ```
 
 Output
