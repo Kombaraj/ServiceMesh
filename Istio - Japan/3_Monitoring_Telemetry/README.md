@@ -7,15 +7,14 @@ kubectl get pod -n istio-system
 
 # output
 NAME                                    READY   STATUS    RESTARTS   AGE
-grafana-74dc798895-5wwk8                1/1     Running   0          22m
 istio-egressgateway-7c6c6cd8b9-c87lz    1/1     Running   0          22m
 istio-ingressgateway-5d869f5bbf-bvpxs   1/1     Running   0          22m
-istio-tracing-8584b4d7f9-7wmsw          1/1     Running   0          22m
 istiod-648555b9b7-qgtg9                 1/1     Running   0          23m
-kiali-6f457f5964-9dhh9                  1/1     Running   0          22m
-prometheus-7fb8c98b68-h2rfp             2/2     Running   0          22m
 ```
-
+![alt text](../imgs/prometheus_install.png "Prometheus")
+![alt text](../imgs/kiali_install.png "Kiali")
+![alt text](../imgs/grafana_install.png "Grafana")
+![alt text](../imgs/kiali_pod.png "Kiali")
 ## 3.1 Check Grafana dashboard
 ```
 istioctl dashboard grafana

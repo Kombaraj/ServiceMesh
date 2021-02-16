@@ -53,7 +53,7 @@ Data plane:
         - Failovers
         - Health checks
     - Security and Authentication
-        - rate limiting
+        - Rate limiting
         - TLS termination
 
 
@@ -107,7 +107,7 @@ Benefits:
           ![alt text](../imgs/istio_retries.png "")
         - mirror live traffic
           ![alt text](../imgs/istio_mirror.png "")
-        - rate limiting
+        - Rate limiting
         - circuit breaker
         - Control egress traffic
 - [Security](https://istio.io/docs/concepts/security/)

@@ -240,6 +240,7 @@ curl -v $(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='
 < x-envoy-upstream-service-time: 1
 < server: istio-envoy
 ```
+![alt text](../imgs/Guestbook_Gateway.PNG "")
 
 Check `kiali` dashboard
 ```
@@ -287,7 +288,7 @@ kubectl delete ingress guestbook
 # 5.7 Deploy Another Bookinfo Sample app
 First delete guestbook apps
 ```
-kubectl delete rc,svc,vs,gateway,ingress --all
+kubectl delete -f guestbook-all-in-one.yaml
 ```
 
 Deploy bookinfo
@@ -319,5 +320,6 @@ a5a1acc36239d46038f3dd828465c946-706040707.us-west-2.elb.amazonaws.com/productpa
 ![alt text](../imgs/bookinfo_ui.png "")
 
 Check Kiali dashboard
+
 ![alt text](../imgs/bookinfo_kiali.png "")
 
