@@ -6,7 +6,7 @@ Remember in chapter 1, we talked about Istio Service Mesh Architecture:
 
 All traffic that your mesh services send and receive (data plane traffic) is __proxied through Envoy__, making it easy to direct and control traffic around your mesh without making any changes to your services.
 
-![alt text](../imgs/istio_architecture.svg "Istio Architecture")
+![alt text](../imgs/istio_architecture.png "Istio Architecture")
 
 
 To recap what Data Plane's Envoy Proxy is capable of:
@@ -39,7 +39,6 @@ To recap what Data Plane's Envoy Proxy is capable of:
 
 ## Step 1: Add version label to pods
 
-![alt text](../imgs/istio_destination_rule_traffic_splitting2.png "")
 
 ```sh
 # check pod labels for pod with app=reviews
@@ -88,8 +87,6 @@ reviews   ClusterIP   10.100.5.108   <none>        9080/TCP   23h   app=reviews,
 
 
 ## Step 2: Create Istio DestinationRule resource
-
-![alt text](../imgs/istio_destination_rule_traffic_splitting3.png "")
 
 A subset/version of a route destination is identified with a reference to a named service subset which must be declared in a corresponding DestinationRule.
 
@@ -153,7 +150,6 @@ reviews   reviews   5s
 
 ## Step 3: Add Subset and Weight to route destination in Virtual Service
 
-![alt text](../imgs/istio_destination_rule_traffic_splitting4.png "")
 
 In [virtualservice_reviews_canary.yaml](virtualservice_reviews_canary.yaml),
 ```yaml
