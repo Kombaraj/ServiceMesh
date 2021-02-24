@@ -11,9 +11,9 @@ istio-egressgateway-7c6c6cd8b9-c87lz    1/1     Running   0          22m
 istio-ingressgateway-5d869f5bbf-bvpxs   1/1     Running   0          22m
 istiod-648555b9b7-qgtg9                 1/1     Running   0          23m
 ```
-![alt text](../imgs/prometheus_install.png "Prometheus")
-![alt text](../imgs/kiali_install.png "Kiali")
-![alt text](../imgs/grafana_install.png "Grafana")
+![alt text](../imgs/Prometheus_Install.PNG "Prometheus")
+![alt text](../imgs/kiali_install.PNG "Kiali")
+![alt text](../imgs/Grafana_Install.PNG "Grafana")
 ![alt text](../imgs/kiali_pod.PNG "Kiali")
 ## 3.1 Check Grafana dashboard
 ```
