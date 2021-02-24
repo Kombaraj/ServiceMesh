@@ -14,7 +14,7 @@ istiod-648555b9b7-qgtg9                 1/1     Running   0          23m
 ![alt text](../imgs/prometheus_install.png "Prometheus")
 ![alt text](../imgs/kiali_install.png "Kiali")
 ![alt text](../imgs/grafana_install.png "Grafana")
-![alt text](../imgs/kiali_pod.png "Kiali")
+![alt text](../imgs/kiali_pod.PNG "Kiali")
 ## 3.1 Check Grafana dashboard
 ```
 istioctl dashboard grafana
