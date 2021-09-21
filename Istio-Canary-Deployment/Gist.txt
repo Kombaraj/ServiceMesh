@@ -1,3 +1,6 @@
+Victor Github: https://github.com/vfarcic
+https://github.com/vfarcic/k8s-specs
+
 # Source: https://gist.github.com/9b80db17492cee756871228d739da463
 
 ########################
