@@ -105,7 +105,7 @@ Output
 a2addfc9902e244d09dedfff896ebed5-5596a689663d740f.elb.us-east-2.amazonaws.com
 ```
 
-![alt text](../imgs/guestbook_ui_from_ingress.png "K8s Architecture")
+![alt text](../imgs/guestbook_ui_from_ingress.png "Ingress")
 
 
 ## 4.8 Delete AWS ELB created by K8s Service of type LoadBalancer
