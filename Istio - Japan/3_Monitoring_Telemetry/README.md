@@ -15,8 +15,12 @@ istiod-648555b9b7-qgtg9                 1/1     Running   0          23m
 ![alt text](../imgs/kiali_install.PNG "Kiali")
 ![alt text](../imgs/Grafana_Install.PNG "Grafana")
 ![alt text](../imgs/kiali_pod.PNG "Kiali")
-## 3.1 Check Grafana dashboard
+## 3.1 Install
 ```
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/prometheus.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/kiali.yaml
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/grafana.yaml
+
 istioctl dashboard grafana
 ```
 
