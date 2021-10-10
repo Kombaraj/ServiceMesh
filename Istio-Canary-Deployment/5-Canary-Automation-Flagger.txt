@@ -2,14 +2,11 @@
 # Create Cluster #
 ##################
 
-# Docker for Desktop with Istio: https://gist.github.com/d9b92a8e03c2403624fcef25f3fcd4e5
-# minikube with Istio: https://gist.github.com/01f562077f31750d24c8b7ef5b3ae4d0
-# GKE with Istio: https://gist.github.com/80c379849b96f4ae5a2ccd30d843f205
-# EKS with Istio: https://gist.github.com/957971fe8664de180ecc466a8da6017d
-# AKS with Istio: https://gist.github.com/ff3da0c0fc6e76ba7c3bf9acc99b88d8
-
 ######################
 # Installing Flagger #
+# Flagger is a progressive delivery tool that automates the release process for applications running on Kubernetes. 
+# It reduces the risk of introducing a new software version in production by gradually shifting traffic to the new version 
+# while measuring metrics and running conformance tests.
 ######################
 
 kubectl version --output yaml
@@ -19,141 +16,112 @@ kubectl version --output yaml
 kubectl apply \
     --kustomize github.com/weaveworks/flagger/kustomize/istio
 
+kubectl get crd | grep flagger
+
 #####################
 # Deploying The App #
 #####################
 
-cd go-demo-7
+cd code
 
-git pull
+kubectl create namespace go-app
 
-kubectl create namespace go-demo-7
-
-kubectl label namespace go-demo-7 \
+kubectl label namespace go-app \
     istio-injection=enabled
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/db \
+
+kubectl --namespace go-app apply \
+    --filename istio/hpa \
     --recursive
 
-ls -l k8s/app
+kubectl --namespace go-app \
+    rollout status \
+    deployment go-app
 
-cat k8s/app/*
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/app \
-    --recursive
+kubectl --namespace go-app \
+    get deploy,pods,services,gateway,virtualservices,hpa
 
-PROVIDER=[...] # minikube, docker, eks, gke, aks, doks
-
-INGRESS_HOST=$(\
-    ./k8s/istio/get-ingress-host.sh \
-    $PROVIDER)
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
 echo $INGRESS_HOST
 
-curl -v -H "Host: go-demo-7.acme.com" \
-    "http://$INGRESS_HOST/version"
+curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 
-kubectl --namespace go-demo-7 \
-    get gateways,ingresses
 
 ##############################
 # Deploying Flagger Resource #
 ##############################
 
-cat k8s/istio/flagger/exercise/flagger.yaml
+cat istio/flagger/exercise/flagger.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/flagger/exercise/flagger.yaml
+kubectl --namespace go-app apply \
+    --filename istio/flagger/exercise/flagger.yaml
 
-cat k8s/istio/flagger/exercise/gateway.yaml
+kubectl --namespace go-app \
+    get deploy,pods,services,hpa,gateway,virtualservices,destinationrules,canaries
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/flagger/exercise/gateway.yaml
-
-kubectl --namespace go-demo-7 \
-    get deployments
-
-kubectl --namespace go-demo-7 \
-    rollout status \
-    deployment go-demo-7-primary
-
-kubectl --namespace go-demo-7 \
-    get hpa
 
 # Might be `<unknown>` if metrics server is not installed
 
 for i in {1..10}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
     sleep 0.25
 done
 
-kubectl --namespace go-demo-7 \
-    get services
-
-kubectl --namespace go-demo-7 \
-    get destinationrules
-
-kubectl --namespace go-demo-7 \
-    get virtualservices
-
-kubectl --namespace go-demo-7 \
-    get canaries
-
-kubectl --namespace go-demo-7 \
-    describe canary go-demo-7
+kubectl --namespace go-app \
+    describe canary go-app
 
 ###########################
-# Deploying A New Release #
+# Deploying A New Release v2.0.0 #
 ###########################
 
-cat k8s/istio/flagger/exercise/deployment-0-0-2.yaml
-
-diff k8s/app/deployment.yaml \
-    k8s/istio/flagger/exercise/deployment-0-0-2.yaml
-
-echo $INGRESS_HOST
+cat istio/flagger/exercise/go-app-2-0-0.yaml
 
 # Open a second terminal session
 
-export INGRESS_HOST=[...]
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+echo $INGRESS_HOST
 
 while true; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
     sleep 1
 done
 
 # Go back to the first terminal session
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/flagger/exercise/deployment-0-0-2.yaml
+kubectl --namespace go-app apply \
+    --filename istio/flagger/exercise/go-app-2-0-0.yaml
 
-kubectl --namespace go-demo-7 \
-    get deployments
+kubectl --namespace go-app \
+    get deploy,pods,services,hpa,gateway,virtualservices,destinationrules,canaries
 
-kubectl --namespace go-demo-7 \
-    get virtualservices
+kubectl --namespace go-app \
+    describe virtualservice go-app
 
-kubectl --namespace go-demo-7 \
-    describe virtualservice go-demo-7
-
-kubectl --namespace go-demo-7 \
-    get pods
-
-kubectl --namespace go-demo-7 \
+kubectl --namespace go-app \
     get canaries
 
-kubectl --namespace go-demo-7 \
-    describe canary go-demo-7
+kubectl --namespace go-app \
+    describe canary go-app
 
-kubectl --namespace go-demo-7 \
-    describe virtualservice go-demo-7
+kubectl --namespace go-app \
+    describe virtualservice go-app
 
-kubectl --namespace go-demo-7 \
-    get canaries
+kubectl --namespace go-app \
+    get canaries --watch
 
 # Go to the second terminal session and stop the loop with *ctrl+c*
 
@@ -162,25 +130,20 @@ kubectl --namespace go-demo-7 \
 #######################
 
 # Go to the first terminal session
+# Install Prometheus
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/prometheus.yaml
 
-istioctl manifest apply \
-    --set values.grafana.enabled=true
+# Install Grafana
+kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/grafana.yaml
 
-kubectl --namespace istio-system \
-    port-forward $(kubectl \
-    --namespace istio-system \
-    get pod \
-    --selector app=grafana \
-    --output jsonpath='{.items[0].metadata.name}') \
-    3000:3000 &
+# Open Grafana Dashboard
+istioctl dashboard grafana
 
-cat k8s/grafana/flagger.json
+cat istio/flagger/exercise/flagger.json
 
 # Copy the JSON
 
-open "http://localhost:3000/dashboard/import"
-
-# Paste the JSON
+# Paste the JSON in Grafana Dashboard
 
 ##############
 # References #
@@ -194,8 +157,12 @@ open "http://localhost:3000/dashboard/import"
 
 cd ..
 
-killall kubectl
+kubectl delete namespace go-app
 
-kubectl delete namespace go-demo-7
+# Uninstall Istio
+istioctl manifest generate \
+    --set profile=demo \
+    | kubectl delete -f -
 
 # Destroy the cluster (optional)
+eksctl delete cluster eksdemo1

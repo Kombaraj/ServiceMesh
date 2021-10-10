@@ -2,166 +2,149 @@
 # Create Cluster #
 ##################
 
-# Docker for Desktop with Istio: https://gist.github.com/d9b92a8e03c2403624fcef25f3fcd4e5
-# minikube with Istio: https://gist.github.com/01f562077f31750d24c8b7ef5b3ae4d0
-# GKE with Istio: https://gist.github.com/80c379849b96f4ae5a2ccd30d843f205
-# EKS with Istio: https://gist.github.com/957971fe8664de180ecc466a8da6017d
-# AKS with Istio: https://gist.github.com/ff3da0c0fc6e76ba7c3bf9acc99b88d8
 
 ################
-# Fist Release #
+# Fist Release v1.0.0 #
 ################
 
-cd go-demo-7
+cd code
 
-git pull
+kubectl create namespace go-app
 
-kubectl create namespace go-demo-7
-
-kubectl label namespace go-demo-7 \
+kubectl label namespace go-app \
     istio-injection=enabled
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/gateway/ \
+kubectl --namespace go-app apply \
+    --filename istio/gateway/ \
     --recursive
 
-kubectl --namespace go-demo-7 \
+kubectl --namespace go-app \
     rollout status \
-    deployment go-demo-7-primary
+    deployment go-app-primary
 
-chmod +x k8s/istio/get-ingress-host.sh
-
-PROVIDER=[...] # minikube, docker, eks, gke, aks, doks
-
-INGRESS_HOST=$(\
-    ./k8s/istio/get-ingress-host.sh \
-    $PROVIDER)
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
 echo $INGRESS_HOST
 
 for i in {1..10}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
 ###############
-# New Release #
+# New Release v2.0.0 #
 ###############
 
-cat k8s/istio/split/exercise/app-0-0-2-canary.yaml
+cat istio/split/exercise/go-app-2-0-0-canary.yaml
 
-diff k8s/istio/gateway/app/deployment.yaml \
-    k8s/istio/split/exercise/app-0-0-2-canary.yaml
+diff istio/gateway/deployment.yaml \
+    istio/split/exercise/go-app-2-0-0-canary.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/app-0-0-2-canary.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/go-app-2-0-0-canary.yaml
 
-kubectl --namespace go-demo-7 \
+kubectl --namespace go-app \
     rollout status \
-    deployment go-demo-7-canary
+    deployment go-app-canary
+
+kubectl --namespace go-app \
+    get deploy,pods,service,virtualservices,gateway
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
-kubectl --namespace go-demo-7 \
-    get deployments
+kubectl --namespace go-app \
+    describe virtualservice go-app
 
-kubectl --namespace go-demo-7 \
-    describe service go-demo-7
-
-kubectl --namespace go-demo-7 \
-    describe virtualservice go-demo-7
-
-kubectl --namespace go-demo-7 \
-    describe gateway go-demo-7
+kubectl --namespace go-app \
+    describe gateway go-app
 
 #####################
-# Splitting Traffic #
+# Splitting Traffic (without Destination Rule Istio object) #
 #####################
 
-cat k8s/istio/split/exercise/host20.yaml
+cat istio/split/exercise/host20.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/host20.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/host20.yaml
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
-kubectl --namespace go-demo-7 delete \
-    --filename k8s/istio/split/exercise/host20.yaml
+kubectl --namespace go-app delete \
+    --filename istio/split/exercise/host20.yaml
 
-cat k8s/istio/split/exercise/split20.yaml
+#####################
+# Splitting Traffic (using Destination Rule Istio object) #
+#####################
+
+cat istio/split/exercise/split20.yaml
 
 # NOTE: The sum of all `weight` entries must be 100
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/split20.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/split20.yaml
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
 ###################
 # Rolling Forward #
 ###################
 
-cat k8s/istio/split/exercise/split40.yaml
+cat istio/split/exercise/split40.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/split40.yaml
-
-for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
-done
-
-cat k8s/istio/split/exercise/split60.yaml
-
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/split60.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/split40.yaml
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
+
 
 ############################
 # Finishing The Deployment #
 ############################
 
-cat k8s/istio/split/exercise/app-0-0-2.yaml
+cat istio/split/exercise/go-app-2-0-0.yaml
 
-diff k8s/istio/gateway/app/deployment.yaml \
-    k8s/istio/split/exercise/app-0-0-2.yaml
+diff istio/gateway/deployment.yaml \
+    istio/split/exercise/go-app-2-0-0.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/app-0-0-2.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/go-app-2-0-0.yaml
 
-kubectl --namespace go-demo-7 \
+kubectl --namespace go-app \
     rollout status \
-    deployment go-demo-7-primary
+    deployment go-app-primary
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
-cat k8s/istio/split/exercise/split100.yaml
+cat istio/split/exercise/split100.yaml
 
-kubectl --namespace go-demo-7 apply \
-    --filename k8s/istio/split/exercise/split100.yaml
+kubectl --namespace go-app apply \
+    --filename istio/split/exercise/split100.yaml
 
 for i in {1..100}; do 
-    curl -H "Host: go-demo-7.acme.com" \
-        "http://$INGRESS_HOST/version"
+    curl -H "Host: go-app.kombaraj.com" \
+        "http://$INGRESS_HOST/api/hello"
 done
 
-kubectl --namespace go-demo-7 \
+kubectl --namespace go-app \
     get deployments
 
 ##############
@@ -177,6 +160,12 @@ kubectl --namespace go-demo-7 \
 
 cd ..
 
-kubectl delete namespace go-demo-7
+kubectl delete namespace go-app
+
+# Uninstall Istio
+istioctl manifest generate \
+    --set profile=demo \
+    | kubectl delete -f -
 
 # Destroy the cluster (optional)
+eksctl delete cluster eksdemo1

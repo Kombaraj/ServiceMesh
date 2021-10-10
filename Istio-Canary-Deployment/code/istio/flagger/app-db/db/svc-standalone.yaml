@@ -1,0 +1,21 @@
+---
+# Source: go-demo-7/charts/go-demo-7-db/templates/svc-standalone.yaml
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: go-app-db
+  labels:
+    app: go-app-db
+    chart: go-app-db-5.3.0
+    release: "go-app"
+    heritage: "Tiller"
+spec:
+  type: ClusterIP
+  ports:
+  - name: mongodb
+    port: 27017
+    targetPort: mongodb
+  selector:
+    app: go-app-db
+    release: "go-app"

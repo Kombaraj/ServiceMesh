@@ -1,0 +1,33 @@
+---
+
+apiVersion: flagger.app/v1beta1
+kind: Canary
+metadata:
+  name: go-app
+spec:
+  provider: istio
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: go-app
+  progressDeadlineSeconds: 60
+  autoscalerRef:
+    apiVersion: autoscaling/v2beta1
+    kind: HorizontalPodAutoscaler
+    name: go-app
+  service:
+    port: 80
+    targetPort: 8080
+    gateways:
+    - go-app
+    hosts:
+    - go-app.kombaraj.com
+  analysis:
+    interval: 1m
+    threshold: 3
+    maxWeight: 60
+    stepWeight: 20
+    metrics:
+    - name: request-success-rate
+      threshold: 99
+      interval: 1m
