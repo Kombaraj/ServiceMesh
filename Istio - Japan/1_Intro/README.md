@@ -116,7 +116,7 @@ Benefits:
       ![alt text](../imgs/istio_tls.png "Istio TLS")
     - end-to-end authentication and authorization using JWT
       ![alt text](../imgs/istio_requestauthentication_authorizationpolicy_jwt.png "")
-    - ![alt text](../imgs/istio_performance_latency.png "Istio Latency")
+    
 - [Observability](Observability)
     - debug the latency in their architecture
     - Automatic metrics, logs, and traces for all traffic within a cluster, including cluster ingress and egress
@@ -125,7 +125,6 @@ Benefits:
 - New in istio 1.5 and 1.6
     - reduced installation and configuration complexity by moving control plane components into a single component: __Istiod__. This binary includes the features of Pilot, Citadel, Galley, and the sidecar injector
     - high performant ([Istio Performance Benchmarking and script](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [egress gateway performance testing](https://istio.io/blog/2019/egress-performance/))
-        - ![alt text](../imgs/istio_egress_performance_throughput.png "Istio Latency")
         
 
 Refs:
