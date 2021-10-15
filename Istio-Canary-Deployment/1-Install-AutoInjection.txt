@@ -5,9 +5,11 @@
 # Go to https://github.com/istio/istio/releases
 # Pick a release
 # Download and unpack the release, and move it to a directory set in the `PATH`
+istioctl version
 
 ###############################
 # Create Kubernetes Cluster #
+Refer: setup-eks.txt
 ###############################
 
 ####################
@@ -19,7 +21,7 @@ istioctl profile list
 istioctl profile dump demo
 
 istioctl install \
-    --set profile=demo
+    --set profile=demo -y
 
 kubectl get crds | grep 'istio.io'
 
@@ -95,4 +97,4 @@ istioctl manifest generate \
 cd ..
 
 # Destroy the cluster (optional)
-eksctl delete cluster eksdemo1
+eksctl delete cluster kombs-eks
