@@ -126,7 +126,7 @@ Benefits:
     - reduced installation and configuration complexity by moving control plane components into a single component: __Istiod__. This binary includes the features of Pilot, Citadel, Galley, and the sidecar injector
     - high performant ([Istio Performance Benchmarking and script](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [egress gateway performance testing](https://istio.io/blog/2019/egress-performance/))
         - ![alt text](../imgs/istio_egress_performance_throughput.png "Istio Latency")
-        - ![alt text](../imgs/istio_egress_performance_cpu.png "Istio Latency")
+        
 
 Refs:
 - [Istio with Kubernetes on AWS](https://github.com/aws-samples/istio-on-amazon-eks)
