@@ -140,4 +140,12 @@ No resource limits.
 # to disable
 kubectl label namespace default istio-injection-
 ```
+###############
+# Uninstall Istio #
+###############
 
+```sh
+istioctl manifest generate \
+    --set profile=demo \
+    | kubectl delete -f -
+```
