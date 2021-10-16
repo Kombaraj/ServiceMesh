@@ -259,30 +259,34 @@ Now that Istio Ingress Gateway is created, we no longer need K8s ingress control
 
 So let's unintall Nginx Ingress Controller
 ```sh
-helm uninstall nginx-ingress-controller -n nginx-ingress-controller
+kubectl -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/aws/deploy.yaml delete
 
 # output
-release "nginx-ingress-controller" uninstalled
+namespace "ingress-nginx" deleted
+serviceaccount "ingress-nginx" deleted
+configmap "ingress-nginx-controller" deleted
+clusterrole.rbac.authorization.k8s.io "ingress-nginx" deleted
+clusterrolebinding.rbac.authorization.k8s.io "ingress-nginx" deleted
+role.rbac.authorization.k8s.io "ingress-nginx" deleted
+rolebinding.rbac.authorization.k8s.io "ingress-nginx" deleted
+service "ingress-nginx-controller-admission" deleted
+service "ingress-nginx-controller" deleted
+ingressclass.networking.k8s.io "nginx" deleted
+validatingwebhookconfiguration.admissionregistration.k8s.io "ingress-nginx-admission" deleted
+clusterrole.rbac.authorization.k8s.io "ingress-nginx-admission" deleted
+clusterrolebinding.rbac.authorization.k8s.io "ingress-nginx-admission" deleted
+
 ```
 
-Check all the resources are deleted in `nginx-ingress-controller` namespace
-```sh
-kubectl get all -n nginx-ingress-controller
-
-# output
-No resources found.
-
-# delete namespace
-kubectl delete ns nginx-ingress-controller
-```
 
 Now there should be only one AWS ELB created by istio ingressgateway service
 ![alt text](../imgs/aws_elb_console.png "Kiali")
 
+kubectl get ingress
 
 Delete ingress resource
 ```
-kubectl delete ingress guestbook
+kubectl delete ingress frontend
 ```
 
 # 5.7 Deploy Another Bookinfo Sample app
