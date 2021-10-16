@@ -50,7 +50,7 @@ Install/update istio (won't work on v1.6)
   --set values.gateways.istio-ingressgateway.sds.enabled=true  -->
 
 # use "istioctl install" instead
-istioctl install --set profile=demo
+istioctl install --set profile=demo -y
 ```
 
 Output
