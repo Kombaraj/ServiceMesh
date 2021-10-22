@@ -1,0 +1,16 @@
+•	Manual Chaos
+•	ChaosMonkey - https://github.com/Netflix/chaosmonkey
+	o	Requires Spinnaker and MySQL
+	o	Not works well with Kubernetes
+•	Gremlin - https://www.gremlin.com/
+	o	Not Open source
+•	PowerfulSeal - https://github.com/bloomberg/powerfulseal
+	o	Immature and Poor documentation
+•	Kube-monkey - https://github.com/asobti/kube-monkey
+	o	Immature and Poor documentation
+•	Litmus - https://litmuschaos.io/
+	o	Immature and Poor documentation
+•	Gloo Shot - https://github.com/solo-io/glooshot
+	o	New and works at Service Mesh level
+•	Chaos Toolkit - https://chaostoolkit.org/
+	o	Well documented and best choice
