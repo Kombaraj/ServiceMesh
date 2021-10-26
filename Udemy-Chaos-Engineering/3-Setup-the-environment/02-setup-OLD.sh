@@ -1,3 +1,5 @@
+# Source: https://gist.github.com/37b4c10aca0d1214965506a146fc3488
+
 ################################
 # Defining Course Requirements #
 ################################

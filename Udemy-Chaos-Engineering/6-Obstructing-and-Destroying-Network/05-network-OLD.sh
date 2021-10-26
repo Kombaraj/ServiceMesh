@@ -1,8 +1,14 @@
+# Source: https://gist.github.com/455b0321879da7abf4d358a1334fd705
 
 ######################
 # Creating A Cluster #
 ######################
 
+# Docker Desktop: https://gist.github.com/f753c0093a0893a1459da663949df618 (docker.sh)
+# Minikube: https://gist.github.com/ddc923c137cd48e18a04d98b5913f64b (minikube.sh)
+# GKE: https://gist.github.com/2351032b5031ba3420d2fb9a1c2abd7e (gke.sh)
+# EKS: https://gist.github.com/be32717b225891b69da2605a3123bb33 (eks.sh)
+# AKS: https://gist.github.com/c7c9a8603c560eaf88d28db16b14768c (aks.sh)
 
 #################################
 # Installing Istio Service Mesh #
@@ -11,10 +17,6 @@
 # If Docker Desktop and if kept the cluster from the previous section
 kubectl delete \
     --filename https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/cloud/deploy.yaml
-
-# If EKS
-kubectl delete \
-    --filename https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v0.47.0/deploy/static/provider/aws/deploy.yaml
 
 istioctl manifest install \
     --skip-confirmation

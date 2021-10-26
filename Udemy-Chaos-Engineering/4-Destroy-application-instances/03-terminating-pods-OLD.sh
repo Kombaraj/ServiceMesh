@@ -1,7 +1,14 @@
+# Source: https://gist.github.com/419032bc714cc31cd2f72d45ebef07c7
 
 ######################
 # Creating A Cluster #
 ######################
+
+# Docker Desktop: https://gist.github.com/f753c0093a0893a1459da663949df618 (docker.sh)
+# Minikube: https://gist.github.com/ddc923c137cd48e18a04d98b5913f64b (minikube.sh)
+# GKE: https://gist.github.com/2351032b5031ba3420d2fb9a1c2abd7e (gke.sh)
+# EKS: https://gist.github.com/be32717b225891b69da2605a3123bb33 (eks.sh)
+# AKS: https://gist.github.com/c7c9a8603c560eaf88d28db16b14768c (aks.sh)
 
 #############################
 # Deploying The Application #
@@ -46,24 +53,6 @@ kubectl --namespace go-demo-8 \
 
 ###########################
 # Steady State Hypothesis #
-# A Steady State Hypothesis describes “what normal looks like” for your system in order for the experiment to surface information 
-# about weaknesses when compared against the declared “normal” tolerances of what is measured.
-# 
-# Method
-# An experiment’s activities are contained within its Method block.
-
-# Probes
-# A probe is a way of observing a particular set of conditions in the system that is undergoing experimentation.
-
-# Actions
-# An action is a particular activity that needs to be enacted on the system under experimentation.
-
-# Rollbacks
-# An experiment may define a sequence of actions that revert what was undone during the experiment.
-
-# Controls
-# An experiment may declare a set of controls which have an impact over the execution of the experiment itself. 
-# Controls are operational elements rather than experimental.
 ###########################
 
 cat chaos/terminate-pod-ssh.yaml

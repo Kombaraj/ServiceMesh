@@ -1,13 +1,22 @@
+# Source: https://gist.github.com/6be19a176b5cbe0261c81aefc86d516b
 
 ######################
 # Creating A Cluster #
 ######################
+
+# Docker Desktop: https://gist.github.com/f753c0093a0893a1459da663949df618 (docker.sh)
+# Minikube: https://gist.github.com/ddc923c137cd48e18a04d98b5913f64b (minikube.sh)
+# GKE: https://gist.github.com/2351032b5031ba3420d2fb9a1c2abd7e (gke.sh)
+# EKS: https://gist.github.com/be32717b225891b69da2605a3123bb33 (eks.sh)
+# AKS: https://gist.github.com/c7c9a8603c560eaf88d28db16b14768c (aks.sh)
 
 #############################
 # Deploying The Application #
 #############################
 
 cd go-demo-8
+
+git pull
 
 kubectl create namespace go-demo-8
 
@@ -46,7 +55,7 @@ export INGRESS_HOST=$(minikube ip)
 # If Docker Desktop or EKS
 export INGRESS_HOST=$(kubectl \
     --namespace ingress-nginx \
-    get service ingress-nginx-controller \
+    get service ingress-nginx \
     --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
 
 # If GKE or AKS
