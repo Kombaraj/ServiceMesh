@@ -1,14 +1,12 @@
+# Source: https://gist.github.com/bc334351b8f5659e903de2a6eb9e3079
 
 ######################
 # Creating A Cluster #
 ######################
 
-#################################
-# Installing Istio Service Mesh #
-#################################
-
-istioctl manifest install \
-    --skip-confirmation
+# GKE with Istio: https://gist.github.com/924f817d340d4cc52d1c4dd0b300fd20 (gke-istio.sh)
+# EKS with Istio: https://gist.github.com/3989a9707f80c2faa445d3953f18a8ca (eks-istio.sh)
+# AKS with Istio: https://gist.github.com/c512488f6a30ca4783ce3e462d574a5f (aks-istio.sh)
 
 #############################
 # Deploying The Application #
@@ -16,6 +14,7 @@ istioctl manifest install \
 
 cd go-demo-8
 
+git pull
 
 kubectl create namespace go-demo-8
 
@@ -28,19 +27,11 @@ kubectl --namespace go-demo-8 \
 kubectl --namespace go-demo-8 \
     rollout status deployment go-demo-8
 
-# If EKS
-export INGRESS_HOST=$(kubectl \
-    --namespace istio-system \
-    get service istio-ingressgateway \
-    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
-
-echo $INGRESS_HOST
-
 curl -H "Host: go-demo-8.acme.com" \
     "http://$INGRESS_HOST"
 
 ###########################
-# Draining Worker Nodes #
+# Drainining Worker Nodes #
 ###########################
     
 cat chaos/node-drain.yaml
@@ -48,7 +39,6 @@ cat chaos/node-drain.yaml
 kubectl describe nodes
 
 export NODE_LABEL="beta.kubernetes.io/os=linux"
-export NODE_LABEL="kubernetes.io/hostname=ip-192-168-10-51.us-east-2.compute.internal"
 
 chaos run chaos/node-drain.yaml \
     --rollback-strategy=always
@@ -80,6 +70,11 @@ export CLUSTER_NAME=[...] # Replace `[...]` with the name of the cluster (e.g., 
 
 # NOTE: Might need to increase quotas
 
+# If GKE
+gcloud container clusters \
+    resize $CLUSTER_NAME \
+    --zone us-east1-b \
+    --num-nodes=3
 
 # If EKS
 eksctl get nodegroup \
@@ -94,6 +89,21 @@ eksctl scale nodegroup \
     --nodes 3 \
     $NODE_GROUP
 
+# If AKS
+az aks show \
+    --resource-group chaos \
+    --name chaos \
+    --query agentPoolProfiles
+
+# If EKS
+export NODE_GROUP=[...] # Replace `[...]` with the `name` (e.g., `nodepool1`)
+
+# If AKS
+az aks scale \
+    --resource-group chaos \
+    --name chaos \
+    --node-count 3 \
+    --nodepool-name $NODE_GROUP
 
 kubectl get nodes
 
@@ -140,6 +150,10 @@ kubectl --namespace go-demo-8 \
 ############################
 # Destroying Cluster Zones #
 ############################
+
+# Regional and scalable GKE: https://gist.github.com/88e810413e2519932b61d81217072daf
+# Regional and scalable EKS: https://gist.github.com/d73fb6f4ff490f7e56963ca543481c09
+# Regional and scalable AKS: https://gist.github.com/b068c3eadbc4140aed14b49141790940
 
 ##############################
 # Destroying What We Created #
