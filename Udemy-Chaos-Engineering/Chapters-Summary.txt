@@ -1,0 +1,75 @@
+
+Kubernetes Chaos Engineering With Chaos Toolkit And Istio
+
+
+Section 1: Introduction
+
+Section 2: Choosing The Right Tool
+
+Section 3: Setting Up The Environment
+
+Section 4: Destroying Application Instances
+	Deploying The Application
+	Discovering ChaosToolkit Kubernetes Plugin
+	Terminating Application Instances
+	Defining Steady State Hypothesis
+	Pausing After Actions
+	Probing Phases And Conditions
+	Making The Application Fault-Tolerant
+	
+Section 5: Experimenting With Application Availability
+	Deploying The Application
+	Validating The Application
+	Validating Application Health
+	Validating Application Availability
+	Terminating Application Dependencies
+
+Section 6: Obstructing And Destroying Network
+	Installing Istio Service Mesh
+	Deploying The Application
+	Discovering ChaosToolkit Istio Plugin
+	Aborting Network Requests
+	Rolling Back Abort Failures
+	Making The Application Resilient To Partial Network Failures
+	Increasing Network Latency
+	Aborting All Requests
+	Simulating Denial Of Service Attacks
+	Running Denial Of Service Attacks
+	
+Section 7: Draining And Deleting Nodes
+	Deploying The Application
+	Draining Worker Nodes
+	Uncordoning Worker Nodes
+	Making Nodes Drainable
+	Deleting Worker Nodes
+	Destroying Cluster Zones
+	
+Section 8: Creating Chaos Experiment Reports
+	Deploying The Application
+	Exploring Experiments Journal
+	Creating Experiment Report
+	Creating A Multi-Experiment Report
+	
+Section 9: Running Chaos Experiments Inside A Kubernetes Cluster
+	Deploying The Application
+	Setting Up Chaos Toolkit In Kubernetes
+	Types Of Experiment Executions
+	Running One-Shot Experiments
+	Running Scheduled Experiments
+	Running Failed Scheduled Experiments
+	Sending Experiment Notifications
+	Sending Selective Notifications
+	
+Section 10: Executing Random Chaos
+	Deploying The Application
+	Deploying Dashboard Applications
+	Exploring Grafana Dashboards
+	Exploring Kiali Dashboards
+	Preparing For Termination Of Instances
+	Terminating Random Application Instances
+	Disrupting Network Traffic
+	Preparing For Termination Of Nodes
+	Terminating Random Nodes
+	Monitoring And Alerting With Prometheus
+	
+	
