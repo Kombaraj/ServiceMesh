@@ -246,7 +246,7 @@ eksctl create cluster \
 ```bash
 eksctl create cluster --name=kombs-eks \
                        --region=us-east-2 \
-                       --version=1.16 \
+                       --version=1.20 \
                        --node-type=t3.medium \
                        --nodes=2 \
                        --nodes-min=2 \
