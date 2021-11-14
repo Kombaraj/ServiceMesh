@@ -244,7 +244,7 @@ eksctl create cluster \
 (OR)
 
 ```bash
-eksctl create cluster --name=eksdemo1 \
+eksctl create cluster --name=kombs-eks \
                        --region=us-east-2 \
                        --version=1.16 \
                        --node-type=t3.medium \
@@ -253,7 +253,7 @@ eksctl create cluster --name=eksdemo1 \
                        --nodes-max=4 \
                        --node-volume-size=20 \
                        --ssh-access \
-                       --ssh-public-key=kube-demo \
+                       --ssh-public-key=cks-key01 \
                        --managed \
                        --asg-access \
                        --external-dns-access \
