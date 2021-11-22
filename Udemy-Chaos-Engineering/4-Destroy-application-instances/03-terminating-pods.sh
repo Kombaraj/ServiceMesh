@@ -108,6 +108,9 @@ kubectl --namespace go-demo-8 \
 kubectl --namespace go-demo-8 \
     describe pod go-demo-8
 
+kubectl --namespace go-demo-8 \
+    get pods
+
 cat chaos/terminate-pod-phase.yaml
 
 diff chaos/terminate-pod-pause.yaml \
@@ -150,6 +153,8 @@ kubectl --namespace go-demo-8 \
     deployment go-demo-8
 
 chaos run chaos/terminate-pod-phase.yaml
+
+# Note: The Application is now Fault Tolerant not Highly Available
 
 ##############################
 # Destroying What We Created #

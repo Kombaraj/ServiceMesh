@@ -48,7 +48,7 @@ cat chaos/node-drain.yaml
 kubectl describe nodes
 
 export NODE_LABEL="beta.kubernetes.io/os=linux"
-export NODE_LABEL="kubernetes.io/hostname=ip-192-168-10-51.us-east-2.compute.internal"
+export NODE_LABEL="kubernetes.io/hostname=ip-192-168-48-111.us-east-2.compute.internal"
 
 chaos run chaos/node-drain.yaml \
     --rollback-strategy=always

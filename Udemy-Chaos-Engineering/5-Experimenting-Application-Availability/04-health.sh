@@ -19,6 +19,9 @@ kubectl --namespace go-demo-8 \
 kubectl --namespace go-demo-8 \
     rollout status deployment go-demo-8
 
+kubectl --namespace go-demo-8 \
+    get pods,svc,deploy
+
 ##############################
 # Validating The Application #
 ##############################
@@ -89,7 +92,7 @@ kubectl --namespace go-demo-8 \
     get pods
 
 #######################################
-# Validating Application Availability #
+# Validating Application - Highly Available #
 #######################################
 
 cat chaos/health-http.yaml
