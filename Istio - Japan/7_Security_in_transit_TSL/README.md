@@ -1,4 +1,5 @@
 # Security in transit (HTTPS)
+![alt text](../imgs/security_arch.png "")
 
 # 7.1 Enable HTTPS (TLS Termination) for Single Host using Istio Gateway
 Refs:
@@ -618,6 +619,9 @@ curl -v \
 
 
 # 7.3 Verify Mutual TLS among Apps inside Istio Service Mesh
+
+![alt text](../imgs/sec1.png "")
+
 Ref:
 - https://istio.io/latest/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls
 
@@ -672,7 +676,10 @@ curl httpbin/headers
   }
 ```
 
-
+# Authentication
+![alt text](../imgs/auth.png "")
+![alt text](../imgs/peer_auth1.png "")
+![alt text](../imgs/peer_auth2.png "")
 
 # 7.4 Enable STRICT Mutual-TLS in Mesh Globally (all namespaces)
 Ref:

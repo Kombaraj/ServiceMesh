@@ -3,6 +3,7 @@
 # 1.1 What is Service Mesh
 Ref: https://istio.io/docs/concepts/what-is-istio/#what-is-a-service-mesh
 
+![alt text](../imgs/servicemesh.png "")
 
 __Istio Service Mesh__ is a network connectivity (i.e. __mesh__) within Kubernetes cluster created by __Envoy proxy__ containers, be it a standalone or a sidecar proxy :
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istio_virtual_service.png "")

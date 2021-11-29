@@ -6,6 +6,8 @@ Refs:
 - https://istio.io/latest/docs/reference/config/networking/gateway/
 - https://istio.io/latest/docs/concepts/traffic-management/#gateways
 
+![alt text](../imgs/istio_gateway.png "")
+
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istio_gateway.png "")
 
 Gateway is a load balancer:
@@ -81,6 +83,7 @@ Analogy is something like below:
 # 5.3 What is Virtual Service
 Ref: https://istio.io/latest/docs/concepts/traffic-management/#virtual-services
 
+![alt text](../imgs/istio_virtualservice.png "")
 
 Here is the 10,000 foot view:
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istiod.png "")

@@ -90,6 +90,7 @@ reviews   ClusterIP   10.100.5.108   <none>        9080/TCP   23h   app=reviews,
 
 A subset/version of a route destination is identified with a reference to a named service subset which must be declared in a corresponding DestinationRule.
 
+![alt text](../imgs/istio_destination_rule.png "")
 
 ### DestinationRule Anatomy
 In [destination_rules_versioning.yaml](destination_rules_versioning.yaml),
@@ -441,6 +442,7 @@ Refs:
 - https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection-Abort
 - https://istio.io/latest/docs/concepts/traffic-management/#fault-injection
 
+![alt text](../imgs/fault.png "")
 
 ![alt text](../imgs/istio_fault_abort.png "")
 

@@ -129,10 +129,6 @@ curl --header "Authorization: Bearer $TOKEN" $INGRESS_HOST/headers -v
 < x-envoy-upstream-service-time: 4
 ```
 
-# Authorization
-![alt text](../imgs/authorization.png "")
-![alt text](../imgs/authorization_actions.png "")
-![alt text](../imgs/auth_policy.png "")
 
 # 8.2 Enable End-User Authentication with JWT Token per Path
 
