@@ -21,10 +21,13 @@ kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samp
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/kiali.yaml
 kubectl apply -f https://raw.githubusercontent.com/istio/istio/release-1.11/samples/addons/grafana.yaml
 
-istioctl dashboard grafana
 ```
 
 ## Grafana Dashboard Walkthrough
+```
+istioctl dashboard grafana
+```
+
 Create kubernetes dashboard on grafana by:
 + icon > type `3119` dashboard ID > Select ‘Prometheus’ as the endpoint under prometheus data sources drop down.
 

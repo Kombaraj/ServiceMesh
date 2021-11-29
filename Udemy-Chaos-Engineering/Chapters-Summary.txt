@@ -7,7 +7,12 @@ Section 1: Introduction
 Section 2: Choosing The Right Tool
 
 Section 3: Setting Up The Environment
-
+	Git
+	kubectl
+	kubernetes 
+	helm
+	python, pip
+	ChaosToolkit
 Section 4: Destroying Application Instances
 	Deploying The Application
 	Discovering ChaosToolkit Kubernetes Plugin
@@ -18,8 +23,9 @@ Section 4: Destroying Application Instances
 	Making The Application Fault-Tolerant
 	
 Section 5: Experimenting With Application Availability
-	Deploying The Application
+	Deploying The Application (App and DB)
 	Validating The Application
+	   Install Nginx Ingress Controller
 	Validating Application Health
 	Validating Application Availability
 	Terminating Application Dependencies

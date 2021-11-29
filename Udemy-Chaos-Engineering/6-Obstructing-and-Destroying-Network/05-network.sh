@@ -235,3 +235,11 @@ cat chaostoolkit.log
 cd ..
 
 kubectl delete namespace go-demo-8
+
+##############################
+# Uninstall Istio #
+##############################
+
+istioctl manifest generate \
+    --set profile=demo \
+    | kubectl delete -f -

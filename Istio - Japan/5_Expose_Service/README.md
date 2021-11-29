@@ -295,14 +295,14 @@ kubectl delete ingress frontend
 # 5.7 Deploy Another Bookinfo Sample app
 First delete guestbook apps
 ```
-cd 4_Deploy_Apps/
+cd ../4_Deploy_Apps/
 kubectl delete -f guestbook-all-in-one.yaml
 ```
 
 Deploy bookinfo
 ```sh
 # create deployment and service
-
+cd ../5_Expose_Service/
 kubectl apply -f bookinfo.yaml 
 ```
 
