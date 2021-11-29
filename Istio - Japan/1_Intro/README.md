@@ -135,7 +135,7 @@ Refs:
 - [Failed to get secret "istio-ca-secret" thus istiod pod's readiness probe fails on EKS #24009](https://github.com/istio/istio/issues/24009)
 
 
-
+![alt text](../imgs/microservices_problem.png "")
 
 # 1.5 Prerequisites
 

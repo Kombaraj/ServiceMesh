@@ -113,6 +113,10 @@ This is the pod that contains istio pilot (service discovery), Galley (config), 
 # 2.3 Enable Istio Sidecar Injection 
 
 Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later
+
+![alt text](../imgs/sidecars.png "")
+![alt text](../imgs/sidecars_code.png "")
+
 ```sh
 # first describe default namespace
 kubectl describe ns default
