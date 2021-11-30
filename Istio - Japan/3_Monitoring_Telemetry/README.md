@@ -1,6 +1,8 @@
 # 3. Monitoring and Telemtry
 When installing istio using `demo` profile, it installed monitoring tools such as `grafana`, `prometheus`, `kiali`, `jaeger`. We will cover these a bit more in ch10.
 
+![alt text](../imgs/monitor.png "")
+
 ```sh
 # list pods
 kubectl get pod -n istio-system

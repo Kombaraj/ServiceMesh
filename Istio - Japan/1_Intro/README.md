@@ -137,6 +137,8 @@ Refs:
 
 ![alt text](../imgs/microservices_problem.png "")
 
+![alt text](../imgs/solution.png "")
+
 # 1.5 Prerequisites
 
 ## NOTE: if you are going to use minikube, you can skip creating AWS account, installing AWS CLI, eksctl CLI, etc

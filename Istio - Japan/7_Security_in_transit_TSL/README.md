@@ -1,5 +1,6 @@
 # Security in transit (HTTPS)
 ![alt text](../imgs/security_arch.png "")
+![alt text](../imgs/zerotrust.png "")
 
 # 7.1 Enable HTTPS (TLS Termination) for Single Host using Istio Gateway
 Refs:
