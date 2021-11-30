@@ -93,6 +93,8 @@ A subset/version of a route destination is identified with a reference to a name
 ![alt text](../imgs/istio_destination_rule.png "")
 
 ### DestinationRule Anatomy
+![alt text](../imgs/dest_anatomy.png "")
+
 In [destination_rules_versioning.yaml](destination_rules_versioning.yaml),
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
