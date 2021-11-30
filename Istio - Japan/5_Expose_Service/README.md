@@ -106,6 +106,8 @@ For examples,
 # 5.4 VirtualService Anatomy
 Ref: https://istio.io/latest/docs/concepts/traffic-management/#virtual-service-example
 
+![alt text](../imgs/service_virtualservice.png "")
+
 Typical VirtualService yaml looks like this:
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -293,6 +295,9 @@ kubectl delete ingress frontend
 ```
 
 # 5.7 Deploy Another Bookinfo Sample app
+
+![alt text](../imgs/bookinfo_arch.png "")
+
 First delete guestbook apps
 ```
 cd ../4_Deploy_Apps/
