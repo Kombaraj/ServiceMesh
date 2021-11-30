@@ -10,7 +10,16 @@ Optionally, create a dedicated namespace for this showcase and label it appropri
 $ kubectl label namespace default istio-injection=enabled
 
 $ kubectl get svc istio-ingressgateway -n istio-system
+# if GKE
 $ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+echo $INGRESS_HOST
 
 # deploy sample application
 $ kubectl apply -f kubernetes/hello-istio.yaml
@@ -32,11 +41,19 @@ $ kubectl apply -f kubernetes/hello-istio-uri-match.yaml
 $ http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
 $ http get $INGRESS_HOST/api/v1/hello Host:hello-istio.cloud
 $ http get $INGRESS_HOST/api/v2/hello Host:hello-istio.cloud
+(OR)
+curl -H "Host: hello-istio.cloud" "http://$INGRESS_HOST/api/hello"
+curl -H "Host: hello-istio.cloud" "http://$INGRESS_HOST/api/v1/hello"
+curl -H "Host: hello-istio.cloud" "http://$INGRESS_HOST/api/v2/hello"
 
 # apply header based routing
 $ kubectl apply -f kubernetes/hello-istio-user-agent.yaml
 $ http get $INGRESS_HOST/api/hello User-Agent:Chrome Host:hello-istio.cloud
+(OR)
+curl -H "Host: hello-istio.cloud" -H "User-Agent:Chrome" "http://$INGRESS_HOST/api/hello"
 
 $ kubectl apply -f kubernetes/hello-istio-user-cookie.yaml
-$ http get $INGRESS_HOST/api/hello Cookie:user=packtpub Host:hello-istio.cloud
+$ http get $INGRESS_HOST/api/hello Cookie:user=adai Host:hello-istio.cloud
+(OR)
+curl -H "Host: hello-istio.cloud" -H "Cookie:user=adai" "http://$INGRESS_HOST/api/hello"
 ```

@@ -14,9 +14,17 @@ $ kubectl label namespace default istio-injection=enabled
 
 ```
 $ kubectl get svc istio-ingressgateway -n istio-system
+
+# if GKE
 $ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
 
-$ echo $INGRESS_HOST
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+echo $INGRESS_HOST
 
 # deploy sample application
 $ kubectl apply -f kubernetes/hello-istio.yaml
@@ -26,9 +34,13 @@ $ kubectl get all
 $ kubectl apply -f kubernetes/hello-istio-gateway.yaml
 $ kubectl apply -f kubernetes/hello-istio-virtual-service.yaml
 
+
 $ http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
 $ http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
 $ http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
 $ http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
+(OR)
+curl -H "Host: hello-istio.cloud" "http://$INGRESS_HOST/api/hello"
+
 $ watch -n 1 -d http get $INGRESS_HOST/api/hello Host:hello-istio.cloud
 ```

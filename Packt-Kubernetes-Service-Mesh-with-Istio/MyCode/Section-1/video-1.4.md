@@ -14,10 +14,14 @@ under https://istio.io/docs/setup/platform-setup/docker/
 First, you need to download and setup the latest Istio release.
 At the time of writing this is `1.3.4`, upgrade to latest version if desired.
 ```
-$ curl -L https://git.io/getLatestIstio | ISTIO_VERSION=1.3.4 sh -
+# first install istioctl CLI
+URL: https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/
 
-$ cd istio-1.3.4
-$ export PATH=$PWD/bin:$PATH
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.11.3 sh -
+cd istio-1.11.3
+echo "export PATH=$PWD/bin:$PATH" >> ~/.bash_profile
+
+# open new shell to load updated PATH variable
 
 $ istioctl verify-install
 ```
@@ -28,23 +32,25 @@ In this step we are installing the Istio CRDs as well as the components and
 services for the Istio demo.
 
 ```
-# install and bootstrap all the Istio CRDs
-$ for i in install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl apply -f $i; done
-$ kubectl get crds | grep 'istio.io' | wc -l
+# display the list of available profiles
+istioctl profile list
 
-# install the istio demo profile
-$ kubectl apply -f install/kubernetes/istio-demo.yaml
+istioctl install --set profile=demo -y
 
 # Verifying the installation
-$ kubectl get pods -n istio-system
-$ kubectl get svc -n istio-system
+kubectl get pods,svc,deploy -n istio-system
+
+# enable istio sidecar injection by adding a label
+kubectl label namespace default istio-injection=enabled
 ```
 
 ## (Optional) Step 4: Uninstall Istio
 
 In case you want to uninstall Istio, issue the following commands:
 ```
-$ kubectl label namespace default istio-injection-
-$ kubectl delete -f istio-$(VERSION)install/kubernetes/istio-demo.yaml
-$ for i in install/kubernetes/helm/istio-init/files/crd*yaml; do kubectl delete -f $i; done
+kubectl label namespace default istio-injection-
+
+istioctl manifest generate \
+    --set profile=demo \
+    | kubectl delete -f -
 ```

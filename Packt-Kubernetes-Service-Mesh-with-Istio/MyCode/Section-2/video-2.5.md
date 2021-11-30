@@ -10,7 +10,16 @@ Optionally, create a dedicated namespace for this showcase and label it appropri
 $ kubectl label namespace default istio-injection=enabled
 
 $ kubectl get svc istio-ingressgateway -n istio-system
+# if GKE
 $ export INGRESS_HOST=$(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+
+# If EKS
+export INGRESS_HOST=$(kubectl \
+    --namespace istio-system \
+    get service istio-ingressgateway \
+    --output jsonpath="{.status.loadBalancer.ingress[0].hostname}")
+
+echo $INGRESS_HOST
 
 # deploy sample application
 $ kubectl apply -f kubernetes/hello-istio.yaml

@@ -11,7 +11,7 @@ spec:
   - match:
     - headers:
         cookie:
-          regex: "^(.*?;)?(user=packtpub)(;.*)?$"
+          regex: "^(.*?;)?(user=adai)(;.*)?$"
     route:
       - destination:
           host: hello-istio
