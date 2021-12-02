@@ -2,9 +2,6 @@
 
 Will demonstrate how to collect __telemetry__ information from the mesh.
 
-![alt text](../imgs/observe1.png "")
-![alt text](../imgs/observe2.png "")
-![alt text](../imgs/observe3.png "")
 
 # 10.1 Access Istio Envoy Proxy Log
 

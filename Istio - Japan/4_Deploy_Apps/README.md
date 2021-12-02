@@ -61,6 +61,13 @@ service/ingress-nginx-controller-admission   ClusterIP      10.100.140.133   <no
 NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
 deployment.apps/ingress-nginx-controller   1/1     1            1           3m36s
 
+(OR)
+
+Install using Helm:
+helm repo add stable https://charts.helm.sh/stable 
+helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+helm install nginx-ingress ingress-nginx/ingress-nginx
+
 ```
 Loadbalancers created so far:
 ![alt text](../imgs/loadbalancers.png "K8s Architecture")
