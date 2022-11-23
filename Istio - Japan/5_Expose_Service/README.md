@@ -264,6 +264,10 @@ Now that Istio Ingress Gateway is created, we no longer need K8s ingress control
 
 So let's unintall Nginx Ingress Controller
 ```sh
+helm uninstall ingress-nginx -n ingress-nginx
+
+(OR)
+
 kubectl -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/aws/deploy.yaml delete
 
 # output

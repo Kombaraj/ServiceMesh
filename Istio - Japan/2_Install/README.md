@@ -40,14 +40,10 @@ istioctl manifest generate \
   > generated-manifest-demo.yaml
 ```
 
-Install/update istio (won't work on v1.6)
+Install Istio 
 
-~~kubectl apply -f generated-manifest-demo.yaml~~
+
 ```sh
-# note: "istioctl manifest apply" works for both v1.5 and v1.6, but will be deprecated from v1.7 in favor of istioctl install
-<!-- istioctl manifest apply \
-  --set profile=demo \
-  --set values.gateways.istio-ingressgateway.sds.enabled=true  -->
 
 # use "istioctl install" instead
 istioctl install --set profile=demo -y
