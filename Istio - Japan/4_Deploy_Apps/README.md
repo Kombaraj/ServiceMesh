@@ -1,7 +1,7 @@
 # 4. Deploy Sample App to EKS and Expose Service using Ingress
 
 Refs: 
-- https://github.com/kubernetes/examples/tree/master/guestbook/all-in-one
+- https://github.com/kubernetes/examples/tree/master/guestbook
 
 ![alt text](../imgs/guestbook_architecture.png "K8s Architecture")
 
@@ -15,17 +15,79 @@ Backend Redis
 - multi slaves (read)
 - slaves sync continuously from master
 
+## 4.1 Deploy Redis Master
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-master-deployment.yaml
 
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-master-service.yaml
 ```
-kubectl apply -f guestbook-all-in-one.yaml
+
+## 4.2 Deploy Redis Slave
 ```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-replica-deployment.yaml
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-replica-service.yaml
+```
+
+## 4.3 Deploy frontend app
+```
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/frontend-deployment.yaml
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/frontend-service.yaml
+```
+
+Show `replicationcontroller` (which is deprecated k8s resource succeeded by `replicaset` now)created
+```
+kubectl get replicationcontroller
+```
+
+Output
+```
+NAME           DESIRED   CURRENT   READY   AGE
+guestbook      3         3         3       15m
+redis-master   1         1         1       16m
+redis-slave    2         2         2       15m
+```
+
+Get service and pod
+```
+kubectl get pod,service
+```
+
+Output
+```
+NAME                     READY   STATUS    RESTARTS   AGE
+pod/guestbook-dxkpd      1/1     Running   0          16m
+pod/guestbook-fsqx8      1/1     Running   0          16m
+pod/guestbook-nnrjc      1/1     Running   0          16m
+pod/redis-master-6dbj4   1/1     Running   0          17m
+pod/redis-slave-c6wtv    1/1     Running   0          16m
+pod/redis-slave-qccp6    1/1     Running   0          16m
+
+NAME                   TYPE           CLUSTER-IP      EXTERN
+AL-IP
+       PORT(S)          AGE
+service/guestbook      LoadBalancer   10.100.36.45    a24ac7
+1d1c2e046f59e46720494f5322-359345983.us-west-2.elb.amazonaws
+.com   3000:30604/TCP   15m
+service/kubernetes     ClusterIP      10.100.0.1      <none>
+
+       443/TCP          158m
+service/redis-master   ClusterIP      10.100.174.46   <none>
+
+       6379/TCP         17m
+service/redis-slave    ClusterIP      10.100.103.40   <none>
+
+       6379/TCP         16m
+```
+
 
 ## 4.4 Get external ELB DNS
 ```sh
-echo $(kubectl  get svc frontend | awk '{ print $4 }' | tail -1):$(kubectl  get svc frontend | awk '{ print $5 }' | tail -1 | cut -d ":" -f 1)
+echo $(kubectl  get svc guestbook | awk '{ print $4 }' | tail -1):$(kubectl  get svc guestbook | awk '{ print $5 }' | tail -1 | cut -d ":" -f 1)
 
 # output
-a8274ce21a7f94416a5b6214f6f50205-1187236704.us-east-2.elb.amazonaws.com:80
+a24ac71d1c2e046f59e46720494f5322-359345983.us-west-2.elb.amazonaws.com:3000
 ```
 
 Visit it from browser __after 3-5 minutes when ELB is ready__
@@ -38,64 +100,42 @@ Visit it from browser __after 3-5 minutes when ELB is ready__
 
 
 ## 4.6 Install Nginx Ingress Controller
-```
+```sh
+kubectl create namespace nginx-ingress-controller
 
-Refer: https://github.com/kubernetes/ingress-nginx/tree/main/deploy/static/provider/aws
+# stable/nginx-ingress is deprecated 
+# helm repo add stable https://kubernetes-charts.storage.googleapis.com/
+# helm install nginx-ingress-controller stable/nginx-ingress -n nginx-ingress-controller
 
-kubectl -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/aws/deploy.yaml create
-
-
-(OR)
-
-Install using Helm:
-helm repo add stable https://charts.helm.sh/stable 
+# add new repo ingress-nginx/ingress-nginx
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
-kubectl create ns ingress-nginx
-helm install ingress-nginx ingress-nginx/ingress-nginx -n ingress-nginx
+helm repo add stable https://charts.helm.sh/stable
+helm repo update
 
-kubectl -n ingress-nginx get pods,svc,deploy
-
+# install
+helm install nginx-ingress-controller ingress-nginx/ingress-nginx
 ```
-Output
-```bash
-NAME                                            READY   STATUS      RESTARTS   AGE
-pod/ingress-nginx-admission-create-b2lwd        0/1     Completed   0          3m28s
-pod/ingress-nginx-admission-patch-6tj9q         0/1     Completed   0          3m28s
-pod/ingress-nginx-controller-6b969597bc-2hksv   1/1     Running     0          3m34s
 
-NAME                                         TYPE           CLUSTER-IP       EXTERNAL-IP                                                                     PORT(S)                      AGE
-service/ingress-nginx-controller             LoadBalancer   10.100.115.179   a2addfc9902e244d09dedfff896ebed5-5596a689663d740f.elb.us-east-2.amazonaws.com   80:31134/TCP,443:31504/TCP   3m36s
-service/ingress-nginx-controller-admission   ClusterIP      10.100.140.133   <none>                                                                          443/TCP                      3m37s
-
-NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
-deployment.apps/ingress-nginx-controller   1/1     1            1           3m36s
-
-```
-Loadbalancers created so far:
-![alt text](../imgs/loadbalancers.png "K8s Architecture")
 
 ## 4.7 Create Ingress resource for L7 load balancing by http hosts & paths
 
 [ingress.yaml](ingress.yaml)
 ```yaml
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: frontend
-  annotations:
-    kubernetes.io/ingress.class: "nginx"
-    nginx.ingress.kubernetes.io/rewrite-target: /
-spec:
-  rules:
-  - http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: frontend
-            port:
-              number: 80
+apiVersion: extensions/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      kubernetes.io/ingress.class: nginx
+    name: guestbook
+    namespace: default
+  spec:
+    rules:
+      - http:
+          paths:
+            - backend:
+                serviceName: guestbook
+                servicePort: 3000 
+              path: /
 ```
 
 Create ingress resource
@@ -105,16 +145,16 @@ kubectl apply -f ingress.yaml
 
 Get the public DNS of AWS ELB created from the `nginx-ingress-controller-controller` service
 ```bash
-kubectl  get svc ingress-nginx-controller -n ingress-nginx| awk '{ print $4 }' | tail -1
+kubectl  get svc nginx-ingress-controller-controller -n nginx-ingress-controller | awk '{ print $4 }' | tail -1
 ```
 
 Output
 ```bash
 # visit this from browser
-a2addfc9902e244d09dedfff896ebed5-5596a689663d740f.elb.us-east-2.amazonaws.com
+a588cbec4e4e34e1bbc1cc066f38e3e0-1988798789.us-west-2.elb.amazonaws.com
 ```
 
-![alt text](../imgs/guestbook_ui_from_ingress.png "Ingress")
+![alt text](../imgs/guestbook_ui_from_ingress.png "K8s Architecture")
 
 
 ## 4.8 Delete AWS ELB created by K8s Service of type LoadBalancer
@@ -122,7 +162,43 @@ Now modify `guestbook` service type from `LoadBalancer` to `NodePort`.
 
 First get yaml 
 ```bash
-kubectl get svc frontend -o yaml
+kubectl get svc guestbook -o yaml
+```
+
+Output
+```yaml
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"v1","kind":"Service","metadata":{"annotations":{},"labels":{"app":"guestbook"},"name":"guestbook","namespace":"default"},"spec":{"ports":[{"port":3000,"targetPort":"http-server"}],"selector":{"app":"guestbook"},"type":"LoadBalancer"}}
+  creationTimestamp: "2020-06-13T14:20:12Z"
+  finalizers:
+  - service.kubernetes.io/load-balancer-cleanup
+  labels:
+    app: guestbook
+  name: guestbook
+  namespace: default
+  resourceVersion: "14757"
+  selfLink: /api/v1/namespaces/default/services/guestbook
+  uid: 24ac71d1-c2e0-46f5-9e46-720494f5322b
+spec:
+  clusterIP: 10.100.36.45
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30604
+    port: 3000
+    protocol: TCP
+    targetPort: http-server
+  selector:
+    app: guestbook
+  sessionAffinity: None
+  type: LoadBalancer
+status:
+  loadBalancer:
+    ingress:
+    - hostname: a24ac71d1c2e046f59e46720494f5322-359345983.us-west-2.elb.amazonaws.com
 ```
 
 Strip out `status` etc that are added after created
@@ -131,51 +207,47 @@ Strip out `status` etc that are added after created
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
+  annotations:
   labels:
     app: guestbook
-    tier: frontend
+  name: guestbook
+  namespace: default
 spec:
-  # comment or delete the following line if you want to use a LoadBalancer
-  type: NodePort 
-  # if your cluster supports it, uncomment the following to automatically create
-  # an external load-balanced IP for the frontend service.
-  # type: LoadBalancer
   ports:
-  - port: 80
+  - nodePort: 30605
+    port: 3000
+    protocol: TCP
+    targetPort: http-server
   selector:
     app: guestbook
-    tier: frontend
+  type: NodePort
 ```
 
 Delete the existing `guestbook` service as service is immutable
 ```bash
-kubectl -f service_guestbook_nodeport.yaml delete --force
+kubectl delete svc guestbook
 ```
 
 Then apply new service
 ```bash
-kubectl -f service_guestbook_nodeport.yaml create
+kubectl apply -f service_guestbook_nodeport.yaml
 ```
 
 Check services in `default` namespace
 ```bash
 $ kubectl get svc
 
-NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)        AGE
-frontend       NodePort    10.100.240.51   <none>        80:31366/TCP   37s
-kubernetes     ClusterIP   10.100.0.1      <none>        443/TCP        81m
-redis-master   ClusterIP   10.100.153.87   <none>        6379/TCP       47m
-redis-slave    ClusterIP   10.100.69.155   <none>        6379/TCP       47m
-
+NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+guestbook      NodePort    10.100.53.19    <none>        3000:30605/TCP   20s
+kubernetes     ClusterIP   10.100.0.1      <none>        443/TCP          3h38m
+redis-master   ClusterIP   10.100.174.46   <none>        6379/TCP         77m
+redis-slave    ClusterIP   10.100.103.40   <none>        6379/TCP         76m
 ```
-Now check the Loadbalancers:
-![alt text](../imgs/loadbalancers_after.png "K8s Architecture")
 
 Lastly, check ingress controller's public DNS is reachable from browser
 ```bash
 # visit the URL from browser
-kubectl  get svc ingress-nginx-controller -n ingress-nginx| awk '{ print $4 }' | tail -1
+kubectl  get svc nginx-ingress-controller-controller -n nginx-ingress-controller | awk '{ print $4 }' | tail -1
 ```
 
 ## 4.9  What Just Happened?

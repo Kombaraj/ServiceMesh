@@ -6,8 +6,6 @@ Refs:
 - https://istio.io/latest/docs/reference/config/networking/gateway/
 - https://istio.io/latest/docs/concepts/traffic-management/#gateways
 
-![alt text](../imgs/istio_gateway.png "")
-
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istio_gateway.png "")
 
 Gateway is a load balancer:
@@ -83,7 +81,6 @@ Analogy is something like below:
 # 5.3 What is Virtual Service
 Ref: https://istio.io/latest/docs/concepts/traffic-management/#virtual-services
 
-![alt text](../imgs/istio_virtualservice.png "")
 
 Here is the 10,000 foot view:
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istiod.png "")
@@ -105,8 +102,6 @@ For examples,
 
 # 5.4 VirtualService Anatomy
 Ref: https://istio.io/latest/docs/concepts/traffic-management/#virtual-service-example
-
-![alt text](../imgs/service_virtualservice.png "")
 
 Typical VirtualService yaml looks like this:
 ```yaml
@@ -245,7 +240,6 @@ curl -v $(kubectl -n istio-system get service istio-ingressgateway -o jsonpath='
 < x-envoy-upstream-service-time: 1
 < server: istio-envoy
 ```
-![alt text](../imgs/Guestbook_Gateway.PNG "")
 
 Check `kiali` dashboard
 ```
@@ -264,54 +258,41 @@ Now that Istio Ingress Gateway is created, we no longer need K8s ingress control
 
 So let's unintall Nginx Ingress Controller
 ```sh
-helm uninstall ingress-nginx -n ingress-nginx
-
-(OR)
-
-kubectl -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/main/deploy/static/provider/aws/deploy.yaml delete
+helm uninstall nginx-ingress-controller -n nginx-ingress-controller
 
 # output
-namespace "ingress-nginx" deleted
-serviceaccount "ingress-nginx" deleted
-configmap "ingress-nginx-controller" deleted
-clusterrole.rbac.authorization.k8s.io "ingress-nginx" deleted
-clusterrolebinding.rbac.authorization.k8s.io "ingress-nginx" deleted
-role.rbac.authorization.k8s.io "ingress-nginx" deleted
-rolebinding.rbac.authorization.k8s.io "ingress-nginx" deleted
-service "ingress-nginx-controller-admission" deleted
-service "ingress-nginx-controller" deleted
-ingressclass.networking.k8s.io "nginx" deleted
-validatingwebhookconfiguration.admissionregistration.k8s.io "ingress-nginx-admission" deleted
-clusterrole.rbac.authorization.k8s.io "ingress-nginx-admission" deleted
-clusterrolebinding.rbac.authorization.k8s.io "ingress-nginx-admission" deleted
-
+release "nginx-ingress-controller" uninstalled
 ```
 
+Check all the resources are deleted in `nginx-ingress-controller` namespace
+```sh
+kubectl get all -n nginx-ingress-controller
+
+# output
+No resources found.
+
+# delete namespace
+kubectl delete ns nginx-ingress-controller
+```
 
 Now there should be only one AWS ELB created by istio ingressgateway service
 ![alt text](../imgs/aws_elb_console.png "Kiali")
 
-kubectl get ingress
 
 Delete ingress resource
 ```
-kubectl delete ingress frontend
+kubectl delete ingress guestbook
 ```
 
 # 5.7 Deploy Another Bookinfo Sample app
-
-![alt text](../imgs/bookinfo_arch.png "")
-
 First delete guestbook apps
 ```
-cd ../4_Deploy_Apps/
-kubectl delete -f guestbook-all-in-one.yaml
+kubectl delete rc,svc,vs,gateway,ingress --all
 ```
 
 Deploy bookinfo
 ```sh
 # create deployment and service
-cd ../5_Expose_Service/
 kubectl apply -f bookinfo.yaml 
 ```
 
@@ -338,6 +319,5 @@ a5a1acc36239d46038f3dd828465c946-706040707.us-west-2.elb.amazonaws.com/productpa
 ![alt text](../imgs/bookinfo_ui.png "")
 
 Check Kiali dashboard
-
 ![alt text](../imgs/bookinfo_kiali.png "")
 

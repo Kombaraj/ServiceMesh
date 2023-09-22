@@ -1,18 +1,16 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: frontend
   labels:
     app: guestbook
-    tier: frontend
+  name: guestbook
+  namespace: default
 spec:
-  # comment or delete the following line if you want to use a LoadBalancer
-  type: ClusterIP 
-  # if your cluster supports it, uncomment the following to automatically create
-  # an external load-balanced IP for the frontend service.
-  # type: LoadBalancer
   ports:
-  - port: 80
+  - port: 3000
+    protocol: TCP
+    targetPort: http-server
   selector:
     app: guestbook
-    tier: frontend
+  sessionAffinity: None
+  type: NodePort

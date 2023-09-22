@@ -6,7 +6,7 @@ Remember in chapter 1, we talked about Istio Service Mesh Architecture:
 
 All traffic that your mesh services send and receive (data plane traffic) is __proxied through Envoy__, making it easy to direct and control traffic around your mesh without making any changes to your services.
 
-![alt text](../imgs/istio_architecture.png "Istio Architecture")
+![alt text](../imgs/istio_architecture.svg "Istio Architecture")
 
 
 To recap what Data Plane's Envoy Proxy is capable of:
@@ -39,6 +39,7 @@ To recap what Data Plane's Envoy Proxy is capable of:
 
 ## Step 1: Add version label to pods
 
+![alt text](../imgs/istio_destination_rule_traffic_splitting2.png "")
 
 ```sh
 # check pod labels for pod with app=reviews
@@ -88,13 +89,12 @@ reviews   ClusterIP   10.100.5.108   <none>        9080/TCP   23h   app=reviews,
 
 ## Step 2: Create Istio DestinationRule resource
 
+![alt text](../imgs/istio_destination_rule_traffic_splitting3.png "")
+
 A subset/version of a route destination is identified with a reference to a named service subset which must be declared in a corresponding DestinationRule.
 
-![alt text](../imgs/istio_destination_rule.png "")
 
 ### DestinationRule Anatomy
-
-
 In [destination_rules_versioning.yaml](destination_rules_versioning.yaml),
 ```yaml
 apiVersion: networking.istio.io/v1alpha3
@@ -153,6 +153,7 @@ reviews   reviews   5s
 
 ## Step 3: Add Subset and Weight to route destination in Virtual Service
 
+![alt text](../imgs/istio_destination_rule_traffic_splitting4.png "")
 
 In [virtualservice_reviews_canary.yaml](virtualservice_reviews_canary.yaml),
 ```yaml
@@ -444,7 +445,6 @@ Refs:
 - https://istio.io/latest/docs/reference/config/networking/virtual-service/#HTTPFaultInjection-Abort
 - https://istio.io/latest/docs/concepts/traffic-management/#fault-injection
 
-![alt text](../imgs/fault.png "")
 
 ![alt text](../imgs/istio_fault_abort.png "")
 
@@ -916,31 +916,3 @@ These were trapped by circuit breaking
 Code 200 : 10 (50.0 %)
 Code 503 : 10 (50.0 %) # <------- half returning 5xx
 ```
-
-# 6.14 Dark Launch Deployment
-
-![alt text](../imgs/darklaunch1.png "")
-![alt text](../imgs/darklaunch2.png "")
-
-
-# 6.15 Blue/Green Deployment
-
-![alt text](../imgs/bluegreen1.png "")
-![alt text](../imgs/dest_anatomy.png "")
-![alt text](../imgs/bluegreen2.png "")
-
-# 6.16 Canary Deployment
-
-![alt text](../imgs/canary1.png "")
-![alt text](../imgs/canary2.png "")
-![alt text](../imgs/canary3.png "")
-![alt text](../imgs/canary4.png "")
-![alt text](../imgs/canary5.png "")
-
-# 6.17 Circuit Breaker
-
-![alt text](../imgs/circuit1.png "")
-![alt text](../imgs/circuit2.png "")
-![alt text](../imgs/circuit3.png "")
-![alt text](../imgs/circuit4.png "")
-![alt text](../imgs/circuit5.png "")

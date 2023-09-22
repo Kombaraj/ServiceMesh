@@ -3,9 +3,8 @@
 # 1.1 What is Service Mesh
 Ref: https://istio.io/docs/concepts/what-is-istio/#what-is-a-service-mesh
 
-![alt text](../imgs/servicemesh.png "")
 
-__Istio Service Mesh__ is a network connectivity (i.e. __mesh__) within Kubernetes cluster created by __Envoy proxy__ containers, be it a standalone or a sidecar proxy :
+__Istio Service Mesh__ is a network connectivity (i.e. __mesh__) within Kubernetes cluster created by __Envoy proxy__ containers, be it a standalone or a sidecar proxy:
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istio_virtual_service.png "")
 
 
@@ -26,7 +25,7 @@ Ref: https://istio.io/latest/docs/ops/deployment/architecture/
 Brief Architectural Summary of Istio:
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istiod.png "")
 
-![alt text](../imgs/istio_architecture.png "Istio Architecture")
+![alt text](../imgs/istio_architecture.svg "Istio Architecture")
 
 - service-mesh implementations comes with a __control plane__(istiod) and a __data plane__(a standalone edge Envoy proxy and sidecar Envoy proxies)
 - __data plane__ is composed of a set of intelligent proxies (__Envoy__) deployed as sidecars.  These proxies mediate and control all network communication between microservices. They also collect and report telemetry on all mesh traffic.
@@ -54,7 +53,7 @@ Data plane:
         - Failovers
         - Health checks
     - Security and Authentication
-        - Rate limiting
+        - rate limiting
         - TLS termination
 
 
@@ -108,16 +107,16 @@ Benefits:
           ![alt text](../imgs/istio_retries.png "")
         - mirror live traffic
           ![alt text](../imgs/istio_mirror.png "")
-        - Rate limiting
+        - rate limiting
         - circuit breaker
         - Control egress traffic
 - [Security](https://istio.io/docs/concepts/security/)
     - transparently secure traffic behind the firewall ([Auto mutual TLS among backend services](https://istio.io/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls), [which doubels the latency at max or max 10ms](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [also explained in Istio best practice blog](https://istio.io/blog/2019/performance-best-practices/#3-measure-with-and-without-proxies))
       ![alt text](../imgs/istio_mesh_mtls.png "")
-      ![alt text](../imgs/istio_tls.png "Istio TLS")
+      ![alt text](../imgs/istio_tls.svg "Istio TLS")
     - end-to-end authentication and authorization using JWT
       ![alt text](../imgs/istio_requestauthentication_authorizationpolicy_jwt.png "")
-    
+    - ![alt text](../imgs/istio_performance_latency.png "Istio Latency")
 - [Observability](Observability)
     - debug the latency in their architecture
     - Automatic metrics, logs, and traces for all traffic within a cluster, including cluster ingress and egress
@@ -126,7 +125,8 @@ Benefits:
 - New in istio 1.5 and 1.6
     - reduced installation and configuration complexity by moving control plane components into a single component: __Istiod__. This binary includes the features of Pilot, Citadel, Galley, and the sidecar injector
     - high performant ([Istio Performance Benchmarking and script](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [egress gateway performance testing](https://istio.io/blog/2019/egress-performance/))
-        
+        - ![alt text](../imgs/istio_egress_performance_throughput.png "Istio Latency")
+        - ![alt text](../imgs/istio_egress_performance_cpu.png "Istio Latency")
 
 Refs:
 - [Istio with Kubernetes on AWS](https://github.com/aws-samples/istio-on-amazon-eks)
@@ -135,9 +135,7 @@ Refs:
 - [Failed to get secret "istio-ca-secret" thus istiod pod's readiness probe fails on EKS #24009](https://github.com/istio/istio/issues/24009)
 
 
-![alt text](../imgs/microservices_problem.png "")
 
-![alt text](../imgs/solution.png "")
 
 # 1.5 Prerequisites
 
@@ -234,36 +232,15 @@ eks_worker_nodes_demo.pem
 eksctl create cluster \
     --name eks-from-eksctl \
     --version 1.16 \
-    --region us-east-2 \
+    --region us-west-2 \
     --nodegroup-name workers \
-    --node-type t3.medium \
+    --node-type t3.large \
     --nodes 1 \
     --nodes-min 1 \
     --nodes-max 2 \
     --ssh-access \
-    --ssh-public-key kube-demo.pem \
+    --ssh-public-key ~/.ssh/eks-demo.pem.pub \
     --managed
-```
-(OR)
-
-```bash
-eksctl create cluster --name=kombs-eks \
-                       --region=us-east-2 \
-                       --version=1.20 \
-                       --node-type=t3.medium \
-                       --nodes=2 \
-                       --nodes-min=2 \
-                       --nodes-max=4 \
-                       --node-volume-size=20 \
-                       --ssh-access \
-                       --ssh-public-key=cks-key01 \
-                       --managed \
-                       --asg-access \
-                       --external-dns-access \
-                       --full-ecr-access \
-                       --appmesh-access \
-                       --alb-ingress-access 
-
 ```
 
 Output
@@ -275,7 +252,7 @@ Output
 [ℹ]  subnets for us-west-2a - public:192.168.32.0/19 private:192.168.128.0/19
 [ℹ]  subnets for us-west-2c - public:192.168.64.0/19 private:192.168.160.0/19
 [ℹ]  using SSH public key "/Users/USERNAME/.ssh/eks_worker_nodes_demo.pem.pub" as "eksctl-eks-from-eksctl-nodegroup-workers-51:34:9d:9e:0f:87:a5:dc:0c:9f:b9:0c:29:5a:0b:51" 
-[ℹ]  using Kubernetes version 1.16
+[ℹ]  using Kubernetes version 1.20
 [ℹ]  creating EKS cluster "eks-from-eksctl" in "us-west-2" region with managed nodes
 [ℹ]  will create 2 separate CloudFormation stacks for cluster itself and the initial managed nodegroup
 [ℹ]  if you encounter any issues, check CloudFormation console or try 'eksctl utils describe-stacks --region=us-west-2 --cluster=eks-from-eksctl'
@@ -316,7 +293,7 @@ Output
         "name": "eks-from-eksctl",
         "arn": "arn:aws:eks:us-west-2:202536423779:cluster/eks-from-eksctl",
         "createdAt": "2020-06-13T18:48:18.244000+07:00",
-        "version": "1.16",
+        "version": "1.20",
         "endpoint": "https://242F02260C230DA3D2C46D5C9035E46E.sk1.us-west-2.eks.amazonaws.com",
         "roleArn": "arn:aws:iam::202536423779:role/eksctl-eks-from-eksctl-cluster-ServiceRole-NHR5AAVMYKBY",
         "resourcesVpcConfig": {

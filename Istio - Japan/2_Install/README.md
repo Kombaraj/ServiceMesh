@@ -2,10 +2,8 @@
 # 2.1 Install Istio using istioctl
 ```sh
 # first install istioctl CLI
-URL: https://istio.io/latest/docs/ops/diagnostic-tools/istioctl/
-
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.11.3 sh -
-cd istio-1.11.3
+curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.6.6 sh -
+cd istio-1.6.6
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bash_profile
 
 # open new shell to load updated PATH variable
@@ -32,6 +30,50 @@ istioctl profile list
 istioctl profile dump demo > profile_demo_config.yaml
 ```
 
+Output
+```sh
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+spec:
+  addonComponents:
+    grafana:
+      enabled: true
+      k8s:
+        replicaCount: 1
+    istiocoredns:
+      enabled: false
+    kiali:
+      enabled: true
+      k8s:
+        replicaCount: 1
+    prometheus:
+      enabled: true
+      k8s:
+        replicaCount: 1
+    tracing:
+      enabled: true
+  components:
+    base:
+      enabled: true
+    citadel:
+      enabled: false
+      k8s:
+        strategy:
+          rollingUpdate:
+            maxSurge: 100%
+            maxUnavailable: 25%
+    cni:
+      enabled: false
+    egressGateways:
+    - enabled: true
+      k8s:
+        resources:
+          requests:
+            cpu: 10m
+            memory: 40Mi
+      name: istio-egressgateway
+```
+
 ```sh
 # generate a k8s manifest for profile "demo" before installation
 istioctl manifest generate \
@@ -40,13 +82,17 @@ istioctl manifest generate \
   > generated-manifest-demo.yaml
 ```
 
-Install Istio 
+Install/update istio (won't work on v1.6)
 
-
+~~kubectl apply -f generated-manifest-demo.yaml~~
 ```sh
+# note: "istioctl manifest apply" works for both v1.5 and v1.6, but will be deprecated from v1.7 in favor of istioctl install
+<!-- istioctl manifest apply \
+  --set profile=demo \
+  --set values.gateways.istio-ingressgateway.sds.enabled=true  -->
 
 # use "istioctl install" instead
-istioctl install --set profile=demo -y
+istioctl install --set profile=demo
 ```
 
 Output
@@ -77,22 +123,34 @@ kubectl get pod,svc -n istio-system
 
 # output
 NAME                                        READY   STATUS    RESTARTS   AGE
-pod/istio-egressgateway-5fdc76bf94-lkmj8    1/1     Running   0          5m55s
-pod/istio-ingressgateway-6bd7764b48-kv9f6   1/1     Running   0          5m55s
-pod/istiod-675949b7c5-ml5gc                 1/1     Running   0          6m7s
+pod/grafana-5cc7f86765-krwvf                1/1     Running   0          5m51s
+pod/istio-egressgateway-5c8f9897f7-sfqg6    1/1     Running   0          29m
+pod/istio-ingressgateway-65dd885d75-bbqtn   1/1     Running   0          29m
+pod/istio-tracing-8584b4d7f9-whwjr          1/1     Running   0          5m39s
+pod/istiod-7d6dff85dd-w5szx                 1/1     Running   0          29m
+pod/kiali-696bb665-sngrt                    1/1     Running   0          5m43s
+pod/prometheus-564768879c-w55nb             2/2     Running   0          5m39s
 
-NAME                           TYPE           CLUSTER-IP       EXTERNAL-IP                                                               PORT(S)
-                                                       AGE
-service/istio-egressgateway    ClusterIP      10.100.233.246   <none>                                                                    80/TCP,443/TCP        
-                                                       5m55s
-service/istio-ingressgateway   LoadBalancer   10.100.236.78    a5d757256e8724f90bc535de5f977d6a-2112802907.us-east-2.elb.amazonaws.com   15021:32297/TCP,80:32369/TCP,443:31035/TCP,31400:30002/TCP,15443:31727/TCP   5m55s
-service/istiod                 ClusterIP      10.100.243.65    <none>                                                                    15010/TCP,15012/TCP,443/TCP,15014/TCP                                        6m6s                                         
+NAME                                TYPE           CLUSTER-IP       EXTERNAL-IP                                                              PORT(S)                                                                                                                                      AGE
+service/grafana                     ClusterIP      172.20.151.105   <none>                                                                   3000/TCP                                                                                                                                     5m50s
+service/istio-egressgateway         ClusterIP      172.20.208.92    <none>                                                                   80/TCP,443/TCP,15443/TCP                                                                                                                     29m
+service/istio-ingressgateway        LoadBalancer   172.20.170.225   aa7cfd0021476452ba8c3836365f2df3-478100139.us-east-1.elb.amazonaws.com   15020:31474/TCP,80:30046/TCP,443:31013/TCP,15029:31841/TCP,15030:31961/TCP,15031:30599/TCP,15032:30637/TCP,31400:31608/TCP,15443:32324/TCP   29m
+service/istio-pilot                 ClusterIP      172.20.97.20     <none>                                                                   15010/TCP,15011/TCP,15012/TCP,8080/TCP,15014/TCP,443/TCP                                                                                     29m
+service/istiod                      ClusterIP      172.20.236.155   <none>                                                                   15012/TCP,443/TCP                                                                                                                            29m
+service/jaeger-agent                ClusterIP      None             <none>                                                                   5775/UDP,6831/UDP,6832/UDP                                                                                                                   5m35s
+service/jaeger-collector            ClusterIP      172.20.177.164   <none>                                                                   14267/TCP,14268/TCP,14250/TCP                                                                                                                5m37s
+service/jaeger-collector-headless   ClusterIP      None             <none>                                                                   14250/TCP                                                                                                                                    5m36s
+service/jaeger-query                ClusterIP      172.20.116.249   <none>                                                                   16686/TCP                                                                                                                                    5m38s
+service/kiali                       ClusterIP      172.20.253.248   <none>                                                                   20001/TCP                                                                                                                                    5m45s
+service/prometheus                  ClusterIP      172.20.101.184   <none>                                                                   9090/TCP                                                                                                                                     5m41s
+service/tracing                     ClusterIP      172.20.143.171   <none>                                                                   80/TCP                                                                                                                                       5m33s
+service/zipkin                      ClusterIP      172.20.170.147   <none>                                                                   9411/TCP                                          
 ```
 
 
 Notice a service `istio-ingressgateway` in `istio-system` namespace created AWS ELB of type classic load balancer
 ```
-service/istio-ingressgateway   LoadBalancer   10.100.236.78    a5d757256e8724f90bc535de5f977d6a-2112802907.us-east-2.elb.amazonaws.com   15021:32297/TCP,80:32369/TCP,443:31035/TCP,31400:30002/TCP,15443:31727/TCP   5m55s
+service/istio-ingressgateway        LoadBalancer   10.100.229.231   a5a1acc36239d46038f3dd828465c946-706040707.us-west-2.elb.amazonaws.com   15020:32676/TCP,80:32703/TCP,443:30964/TCP,31400:30057/TCP,15443:32059/TCP   15m
 ```
 
 Check AWS ELB created by istio ingress gateway service
@@ -100,7 +158,7 @@ Check AWS ELB created by istio ingress gateway service
 ![alt text](../imgs/ingress_gateway_aws_elb.png "Istio")
 
 
-Also notice a pod `istiod-675949b7c5-ml5gc`. 
+Also notice a pod `istiod-7d6dff85dd-w5szx`. 
 This is the pod that contains istio pilot (service discovery), Galley (config), sidecar injector, that is `istiod`.
 > istiod unifies functionality that Pilot, Galley, Citadel and the sidecar injector previously performed, into a single binary
 
@@ -109,10 +167,6 @@ This is the pod that contains istio pilot (service discovery), Galley (config), 
 # 2.3 Enable Istio Sidecar Injection 
 
 Add a namespace label to instruct Istio to automatically inject Envoy sidecar proxies when you deploy your application later
-
-![alt text](../imgs/sidecars.png "")
-![alt text](../imgs/sidecars_code.png "")
-
 ```sh
 # first describe default namespace
 kubectl describe ns default
@@ -141,17 +195,3 @@ No resource limits.
 kubectl label namespace default istio-injection-
 ```
 
-# Uninstall Istio #
-
-
-```sh
-istioctl manifest generate \
-    --set profile=demo \
-    | kubectl delete -f -
-```
-
-# Uninstall EKS Kubernetes Cluster #
-
-```sh
-eksctl delete cluster kombs-eks
-```
