@@ -71,13 +71,11 @@ Control Plane:
 
 # 1.3 Architecture change from before and after v1.5
 _Before Istio 1.5_
-![alt text](../imgs/istio.png "Istio")
-
+<img src="../imgs/istio.png" width="500" />
 _After Istio 1.5_
 
 Reduced installation and configuration complexity by moving control plane components into a single component: __Istiod__. This binary includes the features of __Pilot, Citadel, Galley, and the sidecar injector__ (microservices turned into a monolith in favor of easier management)
-![alt text](../imgs/istiod.png "Istio")
-
+<img src="../imgs/istiod.png" width="500" />
 
 
 # 1.4 Why Istio
@@ -96,19 +94,19 @@ Benefits:
     - Request Routing: fine-grained control of traffic behavior with rich routing rules, retries, failovers, and __fault injection__
         - TLS termination
           ![alt text](../imgs/istio_gateway_tls.png "")
-        - canary rollouts
+        - Canary rollouts
           ![alt text](../imgs/istio_destination_rule_traffic_splitting.png "")
-        - identity/header based routing
+        - Identity/header based routing
           ![alt text](../imgs/istio_ideintity_based_routing.png "")    
-        - failure recovery (delay, abort, retries, timeout)
+        - Failure recovery (delay, abort, retries, timeout)
           ![alt text](../imgs/istio_fault_delay.png "")
           ![alt text](../imgs/istio_fault_abort.png "")
           ![alt text](../imgs/istio_timeout.png "")
           ![alt text](../imgs/istio_retries.png "")
         - mirror live traffic
           ![alt text](../imgs/istio_mirror.png "")
-        - rate limiting
-        - circuit breaker
+        - Rate limiting
+        - Circuit breaker
         - Control egress traffic
 - [Security](https://istio.io/docs/concepts/security/)
     - transparently secure traffic behind the firewall ([Auto mutual TLS among backend services](https://istio.io/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls), [which doubels the latency at max or max 10ms](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [also explained in Istio best practice blog](https://istio.io/blog/2019/performance-best-practices/#3-measure-with-and-without-proxies))
