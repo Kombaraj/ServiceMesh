@@ -1,46 +1,47 @@
-# 4. サンプルアプリをEKSクラスターにディプロイ
+# 4. Deploy Sample App to EKS and Expose Service using Ingress
 
 Refs: 
 - https://github.com/kubernetes/examples/tree/master/guestbook
 
 ![alt text](../imgs/guestbook_architecture.png "K8s Architecture")
 
-フロントエンドはPHP app
-- PublicのAWSロードバランサー
-- DBのReadリクエストは複数のSlave　Podsに負荷分散
-- DBのWriteリクエストはMaster Podへ
+Frontend PHP app
+- load balanced by public ELB
+- read request load balanced to multiple slaves
+- write request to a single master
 
-バックエンドのRedis
-- 1つのマスターPod (write)
-- 複数のスレーブPods (read)
+Backend Redis
+- single master (write)
+- multi slaves (read)
+- slaves sync continuously from master
 
-# 4.1 RedisのMaster Podとサービスをディプロイ
+## 4.1 Deploy Redis Master
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-master-deployment.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-master-service.yaml
 ```
 
-# 4.2 RedisのSlave Podsとサービスをディプロイ
+## 4.2 Deploy Redis Slave
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-replica-deployment.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/redis-replica-service.yaml
 ```
 
-# 4.3 フロントエンドアプリをディプロイ
+## 4.3 Deploy frontend app
 ```
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/frontend-deployment.yaml
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/examples/master/guestbook/frontend-service.yaml
 ```
 
-`replicationcontroller`を表示
+Show `replicationcontroller` (which is deprecated k8s resource succeeded by `replicaset` now)created
 ```
 kubectl get replicationcontroller
 ```
 
-アウトプット
+Output
 ```
 NAME           DESIRED   CURRENT   READY   AGE
 guestbook      3         3         3       15m
@@ -48,12 +49,12 @@ redis-master   1         1         1       16m
 redis-slave    2         2         2       15m
 ```
 
-ServiceとPodを表示
+Get service and pod
 ```
 kubectl get pod,service
 ```
 
-アウトプット
+Output
 ```
 NAME                     READY   STATUS    RESTARTS   AGE
 pod/guestbook-dxkpd      1/1     Running   0          16m
@@ -80,24 +81,25 @@ service/redis-slave    ClusterIP      10.100.103.40   <none>
        6379/TCP         16m
 ```
 
-# 4.4 外部に公開するELBのDNSを取得
-```
-$ echo $(kubectl  get svc guestbook | awk '{ print $4 }' | tail -1):$(kubectl  get svc guestbook | awk '{ print $5 }' | tail -1 | cut -d ":" -f 1
-3000)
 
+## 4.4 Get external ELB DNS
+```sh
+echo $(kubectl  get svc guestbook | awk '{ print $4 }' | tail -1):$(kubectl  get svc guestbook | awk '{ print $5 }' | tail -1 | cut -d ":" -f 1)
+
+# output
 a24ac71d1c2e046f59e46720494f5322-359345983.us-west-2.elb.amazonaws.com:3000
 ```
 
-３ー5分待った後にブラウザーからアクセス
+Visit it from browser __after 3-5 minutes when ELB is ready__
 
 ![alt text](../imgs/guestbook_ui.png "K8s Architecture")
 
 
-# 4.5 図解でおさらい
+## 4.5 What Just Happened?!
 ![alt text](../imgs/eks_aws_architecture_with_apps.png "K8s Architecture")
 
 
-# 4.6 Nginx Ingress Controllerをインストール
+## 4.6 Install Nginx Ingress Controller
 ```sh
 kubectl create namespace nginx-ingress-controller
 
@@ -115,7 +117,7 @@ helm install nginx-ingress-controller ingress-nginx/ingress-nginx
 ```
 
 
-# 4.7 IngressリソースをYAMLで作成し、HTTPパスやホストによるL7ロードバランス
+## 4.7 Create Ingress resource for L7 load balancing by http hosts & paths
 
 [ingress.yaml](ingress.yaml)
 ```yaml
@@ -136,36 +138,34 @@ apiVersion: extensions/v1beta1
               path: /
 ```
 
-アプライ
+Create ingress resource
 ```bash
 kubectl apply -f ingress.yaml
 ```
 
-ロードバランサーのPublic DNSを`nginx-ingress-controller-controller` serviceを表示して取得
+Get the public DNS of AWS ELB created from the `nginx-ingress-controller-controller` service
 ```bash
 kubectl  get svc nginx-ingress-controller-controller -n nginx-ingress-controller | awk '{ print $4 }' | tail -1
 ```
 
-アウトプット
+Output
 ```bash
-# ブラウザーからアクセス
+# visit this from browser
 a588cbec4e4e34e1bbc1cc066f38e3e0-1988798789.us-west-2.elb.amazonaws.com
 ```
 
 ![alt text](../imgs/guestbook_ui_from_ingress.png "K8s Architecture")
 
 
+## 4.8 Delete AWS ELB created by K8s Service of type LoadBalancer
+Now modify `guestbook` service type from `LoadBalancer` to `NodePort`.
 
-# 4.8 K8s Service (LoadBalancerタイプ)によって作成されたAWS ELBを削除
-
-そして`guestbook` service を`LoadBalancer`から`NodePort`タイプへ変更.
-
-まずは`guestbook` serviceのYAMLを表示
+First get yaml 
 ```bash
 kubectl get svc guestbook -o yaml
 ```
 
-アウトプット
+Output
 ```yaml
 apiVersion: v1
 kind: Service
@@ -201,8 +201,7 @@ status:
     - hostname: a24ac71d1c2e046f59e46720494f5322-359345983.us-west-2.elb.amazonaws.com
 ```
 
-YAML内の`status`などのメタデータ情報を削除
-
+Strip out `status` etc that are added after created
 [service_guestbook_nodeport.yaml](service_guestbook_nodeport.yaml)
 ```
 apiVersion: v1
@@ -224,17 +223,29 @@ spec:
   type: NodePort
 ```
 
-Serviceはアップデートができないので、一旦既存の`guestbook` serviceを削除
+Delete the existing `guestbook` service as service is immutable
 ```bash
 kubectl delete svc guestbook
 ```
 
-新しいServiceを作成
+Then apply new service
 ```bash
 kubectl apply -f service_guestbook_nodeport.yaml
 ```
 
-`default` namespaceのServiceを表示
+Check services in `default` namespace
+
+<details>
+  <summary>$ kubectl get svc</summary>
+<p>
+  NAME           TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)          AGE
+  guestbook      NodePort    10.100.53.19    <none>        3000:30605/TCP   20s
+  kubernetes     ClusterIP   10.100.0.1      <none>        443/TCP          3h38m
+  redis-master   ClusterIP   10.100.174.46   <none>        6379/TCP         77m
+  redis-slave    ClusterIP   10.100.103.40   <none>        6379/TCP         76m
+</p>
+</details>
+
 ```bash
 $ kubectl get svc
 
@@ -245,19 +256,17 @@ redis-master   ClusterIP   10.100.174.46   <none>        6379/TCP         77m
 redis-slave    ClusterIP   10.100.103.40   <none>        6379/TCP         76m
 ```
 
-ロードバランサーにアクセステスト
+Lastly, check ingress controller's public DNS is reachable from browser
 ```bash
 # visit the URL from browser
 kubectl  get svc nginx-ingress-controller-controller -n nginx-ingress-controller | awk '{ print $4 }' | tail -1
 ```
 
-
-
-# 4.9  図解でおさらい
-1. `guestbook`の`LoadBalancer`Serviceタイプを`NodePort`へ変更
-2. `guestbook` service の前に`nginx-ingress-controller`の`LoadBalancer`Serviceタイプを設置
-3. `nginx-ingress-controller` podがL7負荷分散をする
-4. これにより複数のServicesを1つのIngress Controller Serviceにバインドできる
+## 4.9  What Just Happened?
+1. Replaced `guestbook` service of type `LoadBalancer` to of `NodePort`
+2. Front `guestbook` service with `nginx-ingress-controller` service of type `LoadBalancer`
+3. `nginx-ingress-controller` pod will do L7 load balancing based on HTTP path and host
+4. Now you can create multiple services and bind them to one ingress controller (one AWS ELB)
 
 __Before Ingress__
 ![alt text](../imgs/eks_aws_architecture_with_apps.png "K8s Architecture")
@@ -268,3 +277,9 @@ __After Ingress__
 
 __With Istio Enabled__
 ![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istio.png "K8s Ingress")
+
+
+
+
+
+
