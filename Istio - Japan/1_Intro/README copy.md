@@ -23,11 +23,11 @@ Ref: https://istio.io/latest/docs/ops/deployment/architecture/
 
 
 Brief Architectural Summary of Istio:
-![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istiod.png)
+![alt text](../imgs/eks_aws_architecture_with_apps_ingress_istiod.png "")
 
-<img src="../imgs/istio_architecture.svg" width="750">
+![alt text](../imgs/istio_architecture.svg "Istio Architecture")
 
-- Service Mesh implementations comes with a __control plane__(istiod) and a __data plane__(a standalone edge Envoy proxy and sidecar Envoy proxies)
+- service-mesh implementations comes with a __control plane__(istiod) and a __data plane__(a standalone edge Envoy proxy and sidecar Envoy proxies)
 - __data plane__ is composed of a set of intelligent proxies (__Envoy__) deployed as sidecars.  These proxies mediate and control all network communication between microservices. They also collect and report telemetry on all mesh traffic.
 - __control plane__ lives outside of the request path and is used to administer and control the behavior of the data plane
 
@@ -35,9 +35,9 @@ Brief Architectural Summary of Istio:
 
 
 Data plane:
-- __Envoy proxy__: A high-performance proxy developed in C++ to mediate all inbound and outbound traffic for all services in the service mesh. Envoy proxies are the only Istio components that interact with data plane traffic.
+- __Envoy proxy__: a high-performance proxy developed in C++ to mediate all inbound and outbound traffic for all services in the service mesh. Envoy proxies are the only Istio components that interact with data plane traffic.
     - Traffic control 
-        - A different load balancing policy to traffic for a particular subset of service instances
+        - a different load balancing policy to traffic for a particular subset of service instances
         - Staged rollouts with %-based traffic split
         - HTTP/2 and gRPC proxies
         - Istio Resources
@@ -53,14 +53,14 @@ Data plane:
         - Failovers
         - Health checks
     - Security and Authentication
-        - Rate limiting
+        - rate limiting
         - TLS termination
 
 
 Control Plane: 
 - __Istiod__ (consists of __pilot, galley, and citadel__)
     - Dynamic service discovery: in order to direct traffic within your mesh, Istio needs to know where all your endpoints are
-    - Strong service-to-service and end-user authentication with built-in identity and credential management
+    - strong service-to-service and end-user authentication with built-in identity and credential management
     - Pilot - the core data-plane config (xDS) server
     - Galley - configuration watching, validation, forwarding
     - Citadel - certificate signing, secret generation, integration with CAs, etc
@@ -72,27 +72,23 @@ Control Plane:
 # 1.3 Architecture change from before and after v1.5
 _Before Istio 1.5_
 <img src="../imgs/istio.png" width="500" />
-
+_After Istio 1.5_
 
 Reduced installation and configuration complexity by moving control plane components into a single component: __Istiod__. This binary includes the features of __Pilot, Citadel, Galley, and the sidecar injector__ (microservices turned into a monolith in favor of easier management)
-
-_After Istio 1.5_
 <img src="../imgs/istiod.png" width="500" />
 
 
 # 1.4 Why Istio
 Ref: https://istio.io/blog/2020/tradewinds-2020/
 
-Service mesh requirements can be thought of as a typical __API gateway__ functionality, but instead of having just one API gateway, consider each sidecar Envoy proxies acting as API gateway.
-
-
+Service mesh requirements can be thought of as a typical __API gateway__ functionality, but instead of having just one API gateway, consider each sidecar Envoy proxies acting as API gateway:
 
 
 Benefits:
 - [Traffic Management](https://istio.io/docs/concepts/traffic-management/)
     - Control Ingress Traffic using Gateway, VirtualService, DestinationRules
       ![alt text](../imgs/istio_gw_vs_svc2.png "") 
-    - Load balancing 
+    - load balancing 
       ![alt text](../imgs/istio_destination_rule_lb_rules.png "")
     - Service Entry
     - Request Routing: fine-grained control of traffic behavior with rich routing rules, retries, failovers, and __fault injection__
@@ -107,20 +103,18 @@ Benefits:
           ![alt text](../imgs/istio_fault_abort.png "")
           ![alt text](../imgs/istio_timeout.png "")
           ![alt text](../imgs/istio_retries.png "")
-        - Mirror live traffic
+        - mirror live traffic
           ![alt text](../imgs/istio_mirror.png "")
         - Rate limiting
         - Circuit breaker
         - Control egress traffic
 - [Security](https://istio.io/docs/concepts/security/)
-    - Transparently secure traffic behind the firewall ([Auto mutual TLS among backend services](https://istio.io/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls), [which doubels the latency at max or max 10ms](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [also explained in Istio best practice blog](https://istio.io/blog/2019/performance-best-practices/#3-measure-with-and-without-proxies))
+    - transparently secure traffic behind the firewall ([Auto mutual TLS among backend services](https://istio.io/docs/tasks/security/authentication/authn-policy/#auto-mutual-tls), [which doubels the latency at max or max 10ms](https://github.com/istio/tools/tree/3ac7ab40db8a0d595b71f47b8ba246763ecd6213/perf/benchmark#run-performance-tests), [also explained in Istio best practice blog](https://istio.io/blog/2019/performance-best-practices/#3-measure-with-and-without-proxies))
       ![alt text](../imgs/istio_mesh_mtls.png "")
-      <img src="../imgs/istio_tls.svg" width="650" />
-
-    - End-To-End authentication and authorization using JWT
+      ![alt text](../imgs/istio_tls.svg "Istio TLS")
+    - end-to-end authentication and authorization using JWT
       ![alt text](../imgs/istio_requestauthentication_authorizationpolicy_jwt.png "")
     - ![alt text](../imgs/istio_performance_latency.png "Istio Latency")
-    <img src="../imgs/istio_tls.svg" width="650" />
 - [Observability](Observability)
     - debug the latency in their architecture
     - Automatic metrics, logs, and traces for all traffic within a cluster, including cluster ingress and egress
@@ -232,19 +226,18 @@ eks_worker_nodes_demo.pem
 # use official AWS EKS AMI
 # dedicated VPC
 # EKS not supported in us-west-1
-# Make sure the Key-Pair 'istio-key' is created in AWS Account
 
 eksctl create cluster \
     --name eks-from-eksctl \
-    --version 1.30 \
-    --region us-east-1 \
+    --version 1.16 \
+    --region us-west-2 \
     --nodegroup-name workers \
     --node-type t3.large \
     --nodes 1 \
     --nodes-min 1 \
     --nodes-max 2 \
     --ssh-access \
-    --ssh-public-key istio-key \
+    --ssh-public-key ~/.ssh/eks-demo.pem.pub \
     --managed
 ```
 

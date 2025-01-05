@@ -8,6 +8,11 @@ cd istio-1.19.0
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bash_profile
 
 # open new shell to load updated PATH variable
+
+# For Windows 
+#   Download the latest version
+https://github.com/istio/istio/releases
+# Extract the Zip file and Set Path variable to binary folder Eg: C:\Software\istio-1.24.2\bin
 ```
 
 
@@ -20,7 +25,7 @@ There are a few preset profiles we can install:
 - minimal
 - etc
 
-![alt text](../imgs/istio_profile.png "Istio")
+<img src="../imgs/istio_profile.png" width="600" />
 
 We will install `demo` profile, which comes with ingress/egress gateways, as well as grafana, kiali, jaegger (request tracing), and prometheus monitoring/metrics dashboards.
 ```sh
