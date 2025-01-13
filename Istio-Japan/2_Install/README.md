@@ -6,7 +6,7 @@ Ref: https://istio.io/latest/docs/setup/install/
 curl -L https://istio.io/downloadIstio | sh -
 cd istio-1.19.0
 echo "export PATH=$PWD/bin:$PATH" >> ~/.bash_profile
-
+export PATH=$PWD/bin:$PATH
 # open new shell to load updated PATH variable
 
 # For Windows 
