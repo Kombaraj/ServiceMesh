@@ -188,4 +188,5 @@ kubectl delete namespace istio-system
 # Uninstall EKS Kubernetes Cluster #
 ```sh
 eksctl delete cluster <<Cluster Name>>
+Example: eksctl delete cluster eks-from-eksctl 
 ```
